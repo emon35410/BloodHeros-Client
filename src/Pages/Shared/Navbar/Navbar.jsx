@@ -70,7 +70,7 @@ const Navbar = () => {
                             className="h-12 md:h-14 lg:h-16 w-auto object-contain drop-shadow-md"
                         />
 
-                        <span className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent hidden sm:inline">
+                        <span className="text-xl lg:text-4xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent  sm:inline">
                             Blood<span className='text-green-500'>Heroes</span>
                         </span>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from "../../../assets/bloodheros_logo.png"
 
 const Footer = () => {
     return (
@@ -9,8 +10,20 @@ const Footer = () => {
 
                     {/* Brand Section */}
                     <div>
-                        <div className="mb-4">
-                            <h2 className="text-2xl font-bold text-red-200 mb-3">BloodHeroes</h2>
+                        <div>
+                            <a className="btn btn-ghost  flex items-center gap-2 h-auto ">
+
+                                <img
+                                    src={logo}
+                                    alt="BloodHeroes Logo"
+                                    className="h-12 md:h-14 lg:h-16 w-auto object-contain drop-shadow-md"
+                                />
+
+                                <span className="text-xl lg:text-4xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent  sm:inline">
+                                    Blood<span className='text-green-500'>Heroes</span>
+                                </span>
+
+                            </a>
                             <p className="text-white/85 leading-relaxed">
                                 Saving lives one donation at a time. Join our community of heroes making a difference.
                             </p>

@@ -30,7 +30,7 @@ const Banner = () => {
             <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-20">
                 <div className="max-w-4xl mx-auto text-center">
                     <div data-aos="fade-up" className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8 animate-bounce">
-                        <span className="text-3xl">🩸</span>
+                        <span className="text-2xl">🩸</span>
                         <span className="text-white font-semibold text-sm">Be A Hero Today</span>
                     </div>
                     <div data-aos="fade-up">
@@ -42,7 +42,7 @@ const Banner = () => {
                         </h1>
 
 
-                        <p className="text-lg sm:text-xl text-gray-200 mb-10 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-lg sm:text-xl text-gray-400  mb-10 max-w-2xl mx-auto leading-relaxed">
                             Join our community of heroes and help save lives by donating blood. Every drop counts, and your contribution can bring hope and health to those in need.
                         </p>
                     </div>
@@ -62,14 +62,14 @@ const Banner = () => {
                         </div>
                     </div>
                     <div data-aos="fade-right" className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="group relative px-8 py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-full shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-110 flex items-center gap-3">
+                        <button className="group relative px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-full shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-110 flex items-center gap-3">
                             <span className="text-xl">❤️</span>
                             <span>Donate Blood Now</span>
                             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </button>
-                        <button className="px-8 py-4 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full border-2 border-white/30 hover:bg-white/20 transition-all duration-300 hover:scale-105 flex items-center gap-3">
+                        <button className="px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full border-2 border-white/30 hover:bg-white/20 transition-all duration-300 hover:scale-105 flex items-center gap-3">
                             <span className="text-xl">🔍</span>
                             <span>Find Blood</span>
                         </button>
