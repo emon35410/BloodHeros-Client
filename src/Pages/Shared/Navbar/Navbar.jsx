@@ -16,7 +16,7 @@ const Navbar = () => {
         </li>
         <li>
             <NavLink
-                to="/search"
+                to="/searchDonor"
                 className={({ isActive }) =>
                     `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
                 }
@@ -26,7 +26,7 @@ const Navbar = () => {
         </li>
         <li>
             <NavLink
-                to="/requests"
+                to="/bloodDonationRequest"
                 className={({ isActive }) =>
                     `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
                 }
@@ -36,7 +36,7 @@ const Navbar = () => {
         </li>
         <li>
             <NavLink
-                to="/details"
+                to="/requestDetails"
                 className={({ isActive }) =>
                     `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
                 }

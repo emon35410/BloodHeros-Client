@@ -49,7 +49,7 @@ const FeaturedSection = () => {
     return (
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div data-aos="zoom-in" data-aos="fade-left" className="text-center mb-16">
+                <div  data-aos="fade-left" className="text-center mb-16">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 rounded-full border border-red-200 mb-4">
                         <span className="text-2xl">❤️</span>
                         <span className="text-red-600 font-semibold text-sm">Why Choose BloodHeroes</span>
