@@ -6,6 +6,9 @@ import Loading from "../Components/Loading/Loading";
 import SearchDonor from "../Pages/SearchDonor/SearchDonor";
 import BloodDonationRequest from "../Pages/Blood-Donation-Request/BloodDonationRequest";
 import RequestDetails from "../Pages/Request-Details/RequestDetails";
+import AuthLayout from "../Layouts/AuthLayout";
+import Register from "../Pages/Auth/Register/Register";
+import Login from "../Pages/Auth/Login/Login";
 
 export const router = createBrowserRouter([
   {
@@ -35,4 +38,19 @@ export const router = createBrowserRouter([
         }
     ]
   },
+  {
+    path:"/",
+    Component: AuthLayout,
+    children:[
+      {
+        path:"login",
+        Component: Login
+
+      },
+      {
+        path:"register",
+        Component: Register
+      }
+    ]
+  }
 ]);
