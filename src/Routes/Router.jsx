@@ -9,46 +9,58 @@ import RequestDetails from "../Pages/Request-Details/RequestDetails";
 import AuthLayout from "../Layouts/AuthLayout";
 import Register from "../Pages/Auth/Register/Register";
 import Login from "../Pages/Auth/Login/Login";
+import PrivateRoutes from "./PrivateRoutes";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    errorElement:<ErrorPage></ErrorPage>,
+    errorElement: <ErrorPage></ErrorPage>,
     element: <RootLayout></RootLayout>,
-    hydrateFallbackElement:<Loading></Loading>,
-    children:[
-        {
-            index:true,
-            Component:Home
-            
-        },
-        {
-          path:"searchDonor",
-          Component:SearchDonor
-        },
-        {
-          path:"bloodDonationRequest",
-          element:<BloodDonationRequest></BloodDonationRequest>
+    hydrateFallbackElement: <Loading></Loading>,
+    children: [
+      {
+        index: true,
+        Component: Home
 
-        },
-        {
-          path:"requestDetails",
-          element:<RequestDetails></RequestDetails>
+      },
+      {
+        path: "searchDonor",
+        Component: SearchDonor
+      },
+      {
+        path: "bloodDonationRequest",
+        element: <PrivateRoutes><BloodDonationRequest></BloodDonationRequest></PrivateRoutes>
 
-        }
+      },
+      {
+        path: "requestDetails",
+        element: <RequestDetails></RequestDetails>
+
+      }
     ]
   },
   {
-    path:"/",
+    path: "/",
     Component: AuthLayout,
-    children:[
+    children: [
       {
-        path:"login",
+        path: "login",
         Component: Login
 
       },
       {
-        path:"register",
+        path: "register",
+        loader: async () => {
+          const [districtsRes, upazilasRes] = await Promise.all([
+            fetch("/districts.json"),
+            fetch("/upazilas.json")  
+          ]);
+
+          return {
+            districts: await districtsRes.json(),
+            upazilas: await upazilasRes.json() 
+          };
+        },
         Component: Register
       }
     ]

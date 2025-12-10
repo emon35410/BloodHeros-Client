@@ -1,11 +1,11 @@
 import React from 'react';
-import { Outlet } from 'react-router';
+import { Link, Outlet } from 'react-router';
 import logo from "../assets/bloodheros_logo.png"
 
 const AuthLayout = () => {
     return (
         <div>
-            <a className="btn btn-ghost flex items-center gap-2 h-auto py-2">
+            <Link to="/" className="btn btn-ghost flex items-center gap-2 h-auto py-2">
 
                 <img
                     src={logo}
@@ -17,7 +17,7 @@ const AuthLayout = () => {
                     Blood<span className='text-green-500'>Heroes</span>
                 </span>
 
-            </a>
+            </Link>
             <Outlet></Outlet>
         </div>
     );

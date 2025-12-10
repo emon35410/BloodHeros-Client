@@ -1,6 +1,7 @@
 import React from 'react';
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import logo from "../../../assets/bloodheros_logo.png"
+import useAuth from '../../../Hooks/useAuth';
 
 const Navbar = () => {
     const links = <>
@@ -24,16 +25,7 @@ const Navbar = () => {
                 Search Donors
             </NavLink>
         </li>
-        <li>
-            <NavLink
-                to="/bloodDonationRequest"
-                className={({ isActive }) =>
-                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
-                }
-            >
-                Blood Donation Requests
-            </NavLink>
-        </li>
+
         <li>
             <NavLink
                 to="/requestDetails"
@@ -44,7 +36,25 @@ const Navbar = () => {
                 Request Details
             </NavLink>
         </li>
+        <li>
+            <NavLink
+                to="/bloodDonationRequest"
+                className={({ isActive }) =>
+                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
+                }
+            >
+                Blood Donation Requests
+            </NavLink>
+        </li>
     </>;
+    const { user, logOut } = useAuth();
+    const handleLogout = () => {
+        logOut()
+            .then()
+            .catch(error => {
+                console.log(error)
+            })
+    }
 
     return (
         <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-600 shadow-lg">
@@ -83,16 +93,27 @@ const Navbar = () => {
                     </ul>
                 </div>
                 <div className="navbar-end gap-2">
-                    <a className="btn bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                        </svg>
-                        Login
-                    </a>
-                    <a className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
+                    {
+                        user ?
+                            <Link onClick={handleLogout} className="btn bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                </svg>
+                                Log Out
+                            </Link>
+                            :
+                            <Link to="/login" className="btn bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                </svg>
+                                Login
+                            </Link>
+
+                    }
+                    <Link className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
                         <span className="text-xl">❤️</span>
                         Donate Now
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
