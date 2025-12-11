@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, NavLink } from 'react-router';
 import logo from "../../../assets/bloodheros_logo.png"
 import useAuth from '../../../Hooks/useAuth';
+import { LayoutDashboard, LogOut, UserPen } from 'lucide-react';
 
 const Navbar = () => {
     const links = <>
@@ -90,30 +91,97 @@ const Navbar = () => {
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1 gap-2">
                         {links}
+
                     </ul>
                 </div>
                 <div className="navbar-end gap-2">
-                    {
-                        user ?
-                            <Link onClick={handleLogout} className="btn bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                </svg>
-                                Log Out
-                            </Link>
-                            :
-                            <Link to="/login" className="btn bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                </svg>
-                                Login
-                            </Link>
-
-                    }
                     <Link className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
                         <span className="text-xl">❤️</span>
                         Donate Now
                     </Link>
+                    {
+                        user ?
+                            <>
+                                <div className="dropdown dropdown-end">
+                                    <div
+                                        tabIndex={0}
+                                        role="button"
+                                        className="cursor-pointer flex items-center"
+                                    >
+                                        <img
+                                            className="h-12 w-12 rounded-full border-2 border-red-500 shadow-md hover:scale-105 transition"
+                                            src={user?.photoURL}
+                                            alt="User"
+                                        />
+                                    </div>
+
+                                    {/* BLOOD THEME DROPDOWN MENU */}
+                                    <ul
+                                        tabIndex={0}
+                                        className="dropdown-content menu bg-white rounded-xl shadow-xl w-60 mt-3 p-3 border border-red-200"
+                                    >
+                                        {/* DASHBOARD */}
+                                        <li>
+                                            <Link
+                                                to="/dashboard"
+                                                className="py-3 px-3 font-semibold rounded-lg bg-red-50 text-red-600 
+               hover:bg-red-600 hover:text-white transition-all duration-300 hover:scale-[1.02]
+               shadow-sm hover:shadow-md"
+                                            >
+                                                <LayoutDashboard /> Dashboard
+                                            </Link>
+                                        </li>
+
+                                        {/* PROFILE */}
+                                        <li className="mt-2">
+                                            <Link
+                                                to="/profile"
+                                                className="py-3 px-3 font-semibold rounded-lg bg-red-50 text-red-600 
+               hover:bg-red-600 hover:text-white transition-all duration-300 hover:scale-[1.02]
+               shadow-sm hover:shadow-md"
+                                            >
+                                                <UserPen /> My Profile
+                                            </Link>
+                                        </li>
+
+                                        {/* LOGOUT */}
+                                        <li className="mt-2">
+                                            <button
+                                                onClick={handleLogout}
+                                                className="py-3 px-3 font-semibold rounded-lg bg-red-100 text-red-700 
+               hover:bg-red-700 hover:text-white transition-all duration-300 hover:scale-[1.02]
+               shadow-lg border border-red-300"
+                                            >
+                                                <LogOut /> Logout
+                                            </button>
+                                            <Link className="btn mt-2 bg-red-600 text-white border-none font-semibold shadow-lg hover:bg-red-700 hover:shadow-red-300/50 transition-all duration-300 hover:scale-110 md:hidden sm:flex items-center gap-2 px-5 py-3 rounded-xl">
+                                                <span className="text-xl animate-pulse">❤️</span>Donate Now</Link>
+
+                                        </li>
+                                    </ul>
+                                </div>
+
+
+                            </>
+
+                            :
+                            <>
+                                <Link to="/login" className="btn bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                    </svg>
+                                    Login
+                                </Link>
+                                <Link className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
+                                    <span className="text-xl">❤️</span>
+                                    Donate Now
+                                </Link>
+                            </>
+
+
+                    }
+
+
                 </div>
             </div>
         </div>
