@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../../Hooks/useAuth";
 import { Calendar } from "lucide-react";
+import useAxiousSecure from "../../../Hooks/useAxiousSecure";
+import Swal from "sweetalert2";
 
 const BloodRequest = () => {
     const { user } = useAuth();
     const [districts, setDistricts] = useState([]);
     const [upazilas, setUpazilas] = useState([]);
     const [filteredUpazila, setFilteredUpazila] = useState([]);
+    const axiousSecure = useAxiousSecure();
 
     const {
         register,
@@ -41,18 +44,56 @@ const BloodRequest = () => {
         }
     }, [selectedDistrict, upazilas]);
 
-    // Submit Form
-    const onSubmit = (data) => {
-        const finalData = {
-            ...data,
-            requesterName: user?.displayName,
-            requesterEmail: user?.email,
-            status: "pending",
-        };
-
-        console.log(finalData);
-        alert("Donation Request Created Successfully");
+   // Submit Form
+const onSubmit = (data) => {
+    const finalData = {
+        ...data,
+        requesterName: user?.displayName,
+        requesterEmail: user?.email,
+        status: "pending",
     };
+
+    console.log(finalData);
+
+    // SweetAlert confirmation
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to submit this blood donation request?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, submit it!",
+        cancelButtonText: "No, cancel",
+        reverseButtons: true
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                // Post request to server
+                await axiousSecure.post("/donorRequest", finalData);
+
+                Swal.fire(
+                    "Submitted!",
+                    "Your donation request has been created.",
+                    "success"
+                );
+                 window.location.reload();
+            } catch (error) {
+                console.log(error)
+                Swal.fire(
+                    "Error!",
+                    "Something went wrong. Please try again.",
+                    "error"
+                );
+            }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                "Cancelled",
+                "Your request is not submitted.",
+                "info"
+            );
+        }
+    });
+};
+
 
     return (
         <div className="max-w-3xl mx-auto bg-white shadow-md p-8 rounded-xl border border-gray-200">
