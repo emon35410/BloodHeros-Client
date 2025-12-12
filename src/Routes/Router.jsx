@@ -10,6 +10,12 @@ import AuthLayout from "../Layouts/AuthLayout";
 import Register from "../Pages/Auth/Register/Register";
 import Login from "../Pages/Auth/Login/Login";
 import PrivateRoutes from "./PrivateRoutes";
+import Location from "../Components/Location/Location";
+import DashboardLayout from "../Layouts/DashboardLayout";
+import HomePage from "../Pages/Dashboard/HomePage/HomePage";
+import MyProfile from "../Pages/MyProfile/MyProfile";
+import BloodRequest from "../Pages/Dashboard/Blood_Request/BloodRequest";
+
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +42,14 @@ export const router = createBrowserRouter([
         path: "requestDetails",
         element: <RequestDetails></RequestDetails>
 
+      },
+      {
+        path:"location",
+        Component:Location
+      },
+      {
+        path:"myprofile",
+        Component:MyProfile
       }
     ]
   },
@@ -62,6 +76,20 @@ export const router = createBrowserRouter([
           };
         },
         Component: Register
+      }
+    ]
+  },
+  {
+    path:"dashboard",
+    element:<PrivateRoutes><DashboardLayout></DashboardLayout></PrivateRoutes>,
+    children:[
+      {
+        index:true,
+        element:<HomePage></HomePage>
+      },
+      {
+        path:"bloodrequest",
+        element:<BloodRequest></BloodRequest>
       }
     ]
   }

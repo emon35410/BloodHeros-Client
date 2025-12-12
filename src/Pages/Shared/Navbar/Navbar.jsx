@@ -73,7 +73,7 @@ const Navbar = () => {
                             {links}
                         </ul>
                     </div>
-                    <a className="btn btn-ghost hover:bg-gray-500 flex items-center gap-2 h-auto py-2">
+                    <Link className="btn btn-ghost  flex items-center gap-2 h-auto py-2">
 
                         <img
                             src={logo}
@@ -81,11 +81,11 @@ const Navbar = () => {
                             className="h-12 md:h-14 lg:h-16 w-auto object-contain drop-shadow-md"
                         />
 
-                        <span className="text-xl lg:text-4xl font-bold bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent  sm:inline">
+                        <span className="text-xl lg:text-4xl font-bold bg-gradient-to-r from-white to-red-200 bg-clip-text text-red-500  sm:inline">
                             Blood<span className='text-green-500'>Heroes</span>
                         </span>
 
-                    </a>
+                    </Link>
 
                 </div>
                 <div className="navbar-center hidden lg:flex">
@@ -95,13 +95,14 @@ const Navbar = () => {
                     </ul>
                 </div>
                 <div className="navbar-end gap-2">
-                    <Link className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
-                        <span className="text-xl">❤️</span>
-                        Donate Now
-                    </Link>
+
                     {
                         user ?
                             <>
+                                <Link className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
+                                    <span className="text-xl">❤️</span>
+                                    Donate Now
+                                </Link>
                                 <div className="dropdown dropdown-end">
                                     <div
                                         tabIndex={0}
@@ -135,7 +136,7 @@ const Navbar = () => {
                                         {/* PROFILE */}
                                         <li className="mt-2">
                                             <Link
-                                                to="/profile"
+                                                to="/myprofile"
                                                 className="py-3 px-3 font-semibold rounded-lg bg-red-50 text-red-600 
                hover:bg-red-600 hover:text-white transition-all duration-300 hover:scale-[1.02]
                shadow-sm hover:shadow-md"
