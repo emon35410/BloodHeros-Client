@@ -21,7 +21,7 @@ const DashboardLayout = () => {
         { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/dashboard' },
         { id: 'donate', label: 'Donate Blood', icon: Droplet, path: '/dashboard/donate' },
         { id: 'requests', label: 'Blood Requests', icon: Users, path: '/dashboard/bloodrequest' },
-        { id: 'myrequests', label: 'My Blood Requests', icon: Users, path: '/dashboard/myrequests' },
+        { id: 'myrequests', label: 'My Blood Requests', icon: Users, path: '/dashboard/myrequests/' },
         { id: 'locations', label: 'Find Centers', icon: MapPin, path: '/dashboard/locations' }
     ];
 

@@ -309,7 +309,7 @@ const MyBloodRequest = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
                                                 <Link
-                                                    to={`/dashboard/requests/${request._id}`}
+                                                    to={`/requests/${request._id}`}
                                                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="View Details"
                                                 >

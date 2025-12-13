@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  User, 
-  Mail, 
-  Droplet, 
-  MapPin, 
+import {
+  User,
+  Mail,
+  Droplet,
+  MapPin,
   Calendar,
   Award,
   Heart,
@@ -15,18 +15,24 @@ import {
   Phone,
   Shield
 } from 'lucide-react';
+import useAuth from '../../Hooks/useAuth';
 
 const MyProfile = () => {
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+
+  // Initialize profile data from user context or default values
   const [profileData, setProfileData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+880 1712-345678",
-    bloodGroup: "A+",
-    district: "Dhaka",
-    upazila: "Mohammadpur",
-    avatar: null,
-    joinDate: "January 15, 2023",
+    name: user?.displayName,
+    email: user?.email,
+    avatar: user?.photoURL || null,
+    joinDate: user?.metadata?.creationTime
+      ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+      : "January 15, 2023",
     lastDonation: "November 20, 2024",
     totalDonations: 12,
     livesSaved: 36,
@@ -52,6 +58,7 @@ const MyProfile = () => {
     setIsEditing(false);
     // Here you would typically make an API call to update the profile
     console.log('Profile updated:', editedData);
+    // TODO: Add API call to update user profile in backend
   };
 
   const handleInputChange = (field, value) => {
@@ -69,20 +76,19 @@ const MyProfile = () => {
     }
   };
 
-  const stats = [
-    { label: 'Total Donations', value: profileData.totalDonations, icon: Droplet, color: 'bg-red-500' },
-    { label: 'Lives Saved', value: profileData.livesSaved, icon: Heart, color: 'bg-pink-500' },
-    { label: 'Badges Earned', value: profileData.badges.length, icon: Award, color: 'bg-yellow-500' },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">My Profile</h1>
-          <p className="text-gray-600 mt-1">Manage your account information</p>
+        <div className="my-6 ml-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+            My Profile
+          </h1>
+          <p className="mt-1 text-gray-500">
+            Manage your account information
+          </p>
         </div>
+
         {!isEditing ? (
           <button
             onClick={handleEdit}
@@ -115,7 +121,7 @@ const MyProfile = () => {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {/* Banner */}
         <div className="h-32 bg-gradient-to-r from-red-500 to-pink-600"></div>
-        
+
         {/* Profile Info */}
         <div className="px-8 pb-8">
           {/* Avatar */}
@@ -148,32 +154,12 @@ const MyProfile = () => {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <div key={index} className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`${stat.color} w-12 h-12 rounded-lg flex items-center justify-center`}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">{stat.label}</p>
-                      <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
           {/* Profile Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Personal Information */}
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Personal Information</h3>
-              
+
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
@@ -201,29 +187,13 @@ const MyProfile = () => {
                     value={editedData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                    disabled
+                    title="Email cannot be changed"
                   />
                 ) : (
                   <div className="flex items-center gap-2 text-gray-800">
                     <Mail className="w-5 h-5 text-gray-400" />
                     <span>{profileData.email}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                {isEditing ? (
-                  <input
-                    type="tel"
-                    value={editedData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-800">
-                    <Phone className="w-5 h-5 text-gray-400" />
-                    <span>{profileData.phone}</span>
                   </div>
                 )}
               </div>
@@ -253,7 +223,7 @@ const MyProfile = () => {
             {/* Location & Activity */}
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Location & Activity</h3>
-              
+
               {/* District */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
@@ -309,42 +279,6 @@ const MyProfile = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Badges Section */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">My Badges</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {profileData.badges.map((badge, index) => (
-            <div key={index} className="flex items-center gap-3 p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border-2 border-yellow-200">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-800">{badge}</p>
-                <p className="text-sm text-gray-600">Earned</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Security Section */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <Shield className="w-6 h-6 text-red-600" />
-          Security Settings
-        </h3>
-        <div className="space-y-3">
-          <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between">
-            <span className="text-gray-800 font-medium">Change Password</span>
-            <Edit className="w-4 h-4 text-gray-400" />
-          </button>
-          <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between">
-            <span className="text-gray-800 font-medium">Two-Factor Authentication</span>
-            <Edit className="w-4 h-4 text-gray-400" />
-          </button>
         </div>
       </div>
     </div>

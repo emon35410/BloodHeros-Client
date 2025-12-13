@@ -44,7 +44,7 @@ const Navbar = () => {
                     `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
                 }
             >
-                Blood Donation Requests
+               All Blood Donation Requests
             </NavLink>
         </li>
     </>;
