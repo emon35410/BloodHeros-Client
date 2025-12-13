@@ -15,6 +15,7 @@ import DashboardLayout from "../Layouts/DashboardLayout";
 import HomePage from "../Pages/Dashboard/HomePage/HomePage";
 import MyProfile from "../Pages/MyProfile/MyProfile";
 import BloodRequest from "../Pages/Dashboard/Blood_Request/BloodRequest";
+import MyBloodRequest from "../Pages/Dashboard/My_Blood_Request/MyBloodRequest";
 
 
 export const router = createBrowserRouter([
@@ -90,6 +91,10 @@ export const router = createBrowserRouter([
       {
         path:"bloodrequest",
         element:<BloodRequest></BloodRequest>
+      },
+      {
+        path:"myrequests",
+        element:<MyBloodRequest></MyBloodRequest>
       }
     ]
   }

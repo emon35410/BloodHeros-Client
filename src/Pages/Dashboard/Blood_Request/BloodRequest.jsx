@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../../Hooks/useAuth";
-import { Calendar } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import useAxiousSecure from "../../../Hooks/useAxiousSecure";
 import Swal from "sweetalert2";
 
@@ -44,55 +44,57 @@ const BloodRequest = () => {
         }
     }, [selectedDistrict, upazilas]);
 
-   // Submit Form
-const onSubmit = (data) => {
-    const finalData = {
-        ...data,
-        requesterName: user?.displayName,
-        requesterEmail: user?.email,
-        status: "pending",
-    };
+    // Submit Form
+    const onSubmit = (data) => {
+        const finalTime = `${data.hour}:${data.minute} ${data.ampm}`;
 
-    console.log(finalData);
+        const finalData = {
+            ...data,
+            donationTime: finalTime,        // Add formatted time
+            requesterName: user?.displayName,
+            requesterEmail: user?.email,
+            status: "pending",
+        };
+        console.log(finalData);
 
-    // SweetAlert confirmation
-    Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to submit this blood donation request?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, submit it!",
-        cancelButtonText: "No, cancel",
-        reverseButtons: true
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                // Post request to server
-                await axiousSecure.post("/donorRequest", finalData);
+        // SweetAlert confirmation
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to submit this blood donation request?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, submit it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // Post request to server
+                    await axiousSecure.post("/donorRequest", finalData);
 
+                    Swal.fire(
+                        "Submitted!",
+                        "Your donation request has been created.",
+                        "success"
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.log(error)
+                    Swal.fire(
+                        "Error!",
+                        "Something went wrong. Please try again.",
+                        "error"
+                    );
+                }
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
                 Swal.fire(
-                    "Submitted!",
-                    "Your donation request has been created.",
-                    "success"
-                );
-                 window.location.reload();
-            } catch (error) {
-                console.log(error)
-                Swal.fire(
-                    "Error!",
-                    "Something went wrong. Please try again.",
-                    "error"
+                    "Cancelled",
+                    "Your request is not submitted.",
+                    "info"
                 );
             }
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire(
-                "Cancelled",
-                "Your request is not submitted.",
-                "info"
-            );
-        }
-    });
-};
+        });
+    };
 
 
     return (
@@ -230,6 +232,7 @@ const onSubmit = (data) => {
                     {/* Donation Date */}
 
 
+                    {/* Donation Date */}
                     <div className="relative">
                         <label className="font-semibold text-gray-700">Donation Date</label>
 
@@ -238,15 +241,18 @@ const onSubmit = (data) => {
                                 {...register("donationDate", { required: "Donation date required" })}
                                 type="date"
                                 min={new Date().toISOString().split("T")[0]}
-                                className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800 pr-10 cursor-pointer"
+                                name="donationDate"
+                                className="
+                w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800 pr-10 cursor-pointer 
+                appearance-none        /* remove default icon */
+                [&::-webkit-calendar-picker-indicator]:hidden /* remove Chrome default icon */
+            "
                             />
 
-                            {/* Calendar Icon */}
                             <Calendar
                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 cursor-pointer"
                                 size={20}
                                 onClick={() => {
-                                    // Open the date picker
                                     document.querySelector('input[name="donationDate"]').showPicker();
                                 }}
                             />
@@ -256,6 +262,58 @@ const onSubmit = (data) => {
                             <p className="text-red-500 text-sm">{errors.donationDate.message}</p>
                         )}
                     </div>
+
+
+                    {/* Donation Time (12-hour format with AM/PM) */}
+                    <div>
+                        <label className="font-semibold text-gray-700">Donation Time</label>
+
+                        <div className="grid grid-cols-3 gap-2 mt-1">
+
+                            {/* Hour (1–12) */}
+                            <select
+                                {...register("hour", { required: "Hour required" })}
+                                className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
+                            >
+                                <option value="">Hour</option>
+                                {[...Array(12)].map((_, i) => (
+                                    <option key={i + 1} value={i + 1}>
+                                        {i + 1}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {/* Minute (0–59) */}
+                            <select
+                                {...register("minute", { required: "Minute required" })}
+                                className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
+                            >
+                                <option value="">Min</option>
+                                {[...Array(60)].map((_, i) => (
+                                    <option key={i} value={i < 10 ? `0${i}` : i}>
+                                        {i < 10 ? `0${i}` : i}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {/* AM / PM */}
+                            <select
+                                {...register("ampm", { required: "AM/PM required" })}
+                                className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
+                            >
+                                <option value="">AM/PM</option>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+
+                        {/* Error Messages */}
+                        {errors.hour && <p className="text-red-500 text-sm">{errors.hour.message}</p>}
+                        {errors.minute && <p className="text-red-500 text-sm">{errors.minute.message}</p>}
+                        {errors.ampm && <p className="text-red-500 text-sm">{errors.ampm.message}</p>}
+                    </div>
+
+
 
 
 
