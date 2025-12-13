@@ -17,6 +17,7 @@ import MyProfile from "../Pages/MyProfile/MyProfile";
 import BloodRequest from "../Pages/Dashboard/Blood_Request/BloodRequest";
 import MyBloodRequest from "../Pages/Dashboard/My_Blood_Request/MyBloodRequest";
 import ViewDetails from "../Components/ViewDetails/ViewDetails";
+import SupportUs from "../Components/SupportUs/SupportUs";
 
 
 export const router = createBrowserRouter([
@@ -41,11 +42,6 @@ export const router = createBrowserRouter([
 
       },
       {
-        path: "requestDetails",
-        element: <RequestDetails></RequestDetails>
-
-      },
-      {
         path:"location",
         Component:Location
       },
@@ -57,6 +53,10 @@ export const router = createBrowserRouter([
         path:"requests/:id",
         loader: async()=> await fetch("http://localhost:3000/donorRequest"),
         Component:ViewDetails
+      },
+      {
+        path:"supportus",
+        Component:SupportUs
       }
     ]
   },

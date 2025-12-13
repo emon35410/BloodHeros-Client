@@ -26,17 +26,6 @@ const Navbar = () => {
                 Search Donors
             </NavLink>
         </li>
-
-        <li>
-            <NavLink
-                to="/requestDetails"
-                className={({ isActive }) =>
-                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
-                }
-            >
-                Request Details
-            </NavLink>
-        </li>
         <li>
             <NavLink
                 to="/bloodDonationRequest"
@@ -99,9 +88,9 @@ const Navbar = () => {
                     {
                         user ?
                             <>
-                                <Link className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
+                                <Link to="/supportus" className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
                                     <span className="text-xl">❤️</span>
-                                    Donate Now
+                                    Support Us
                                 </Link>
                                 <div className="dropdown dropdown-end">
                                     <div
@@ -155,8 +144,8 @@ const Navbar = () => {
                                             >
                                                 <LogOut /> Logout
                                             </button>
-                                            <Link className="btn mt-2 bg-red-600 text-white border-none font-semibold shadow-lg hover:bg-red-700 hover:shadow-red-300/50 transition-all duration-300 hover:scale-110 md:hidden sm:flex items-center gap-2 px-5 py-3 rounded-xl">
-                                                <span className="text-xl animate-pulse">❤️</span>Donate Now</Link>
+                                            <Link to="/supportus" className="btn mt-2 bg-red-600 text-white border-none font-semibold shadow-lg hover:bg-red-700 hover:shadow-red-300/50 transition-all duration-300 hover:scale-110 md:hidden sm:flex items-center gap-2 px-5 py-3 rounded-xl">
+                                                <span className="text-xl animate-pulse">❤️</span>Support Us</Link>
 
                                         </li>
                                     </ul>
@@ -173,9 +162,9 @@ const Navbar = () => {
                                     </svg>
                                     Login
                                 </Link>
-                                <Link className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
+                                <Link to="/supportus" className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
                                     <span className="text-xl">❤️</span>
-                                    Donate Now
+                                    Support Us
                                 </Link>
                             </>
 

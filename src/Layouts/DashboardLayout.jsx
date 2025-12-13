@@ -19,8 +19,7 @@ const DashboardLayout = () => {
 
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/dashboard' },
-        { id: 'donate', label: 'Donate Blood', icon: Droplet, path: '/dashboard/donate' },
-        { id: 'requests', label: 'Blood Requests', icon: Users, path: '/dashboard/bloodrequest' },
+        { id: 'requests', label: 'Blood Requests', icon: Droplet, path: '/dashboard/bloodrequest' },
         { id: 'myrequests', label: 'My Blood Requests', icon: Users, path: '/dashboard/myrequests/' },
         { id: 'locations', label: 'Find Centers', icon: MapPin, path: '/dashboard/locations' }
     ];
@@ -91,7 +90,7 @@ const DashboardLayout = () => {
 
                                 {/* Blood Group — Dynamic Later */}
                                 <p className="text-xs text-gray-500">
-                                    Blood Group: <span className='text-red-500 font-bold'>{user?.blood_group || "A+"}</span>
+                                    Blood Group: <span className='text-red-500 font-bold'>{user?.blood_group || "B+"}</span>
                                 </p>
                             </div>
 

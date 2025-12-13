@@ -194,7 +194,7 @@ const BloodDonationRequest = () => {
                                                 </div>
                                                 <div className="flex items-center text-sm text-gray-600">
                                                     <MapPin className="w-4 h-4 mr-1" />
-                                                    <span>{request.upazila}, District: {request.district}</span>
+                                                    <span>{request.upazila}</span>
                                                 </div>
                                             </div>
                                         </td>
