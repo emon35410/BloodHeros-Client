@@ -56,8 +56,8 @@ export const router = createBrowserRouter([
       },
       {
         path:"supportus",
-        Component:SupportUs
-      }
+        element:<PrivateRoutes><SupportUs></SupportUs></PrivateRoutes>
+      },
     ]
   },
   {

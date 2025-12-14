@@ -2,19 +2,26 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { CreditCard, User, Mail, DollarSign } from "lucide-react";
 import Swal from "sweetalert2";
+import useAuth from "../../Hooks/useAuth";
+import useAxiousSecure from "../../Hooks/useAxiousSecure";
 
 const SupportUs = () => {
+  const { user } = useAuth();
+  const axiosSecure = useAxiousSecure();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      name: user?.displayName || "",
+      email: user?.email || "",
+    },
+  });
 
   const onSubmit = (data) => {
-    console.log(data);
-
-    // SweetAlert confirmation
     Swal.fire({
       title: "Confirm Donation",
       text: `Are you sure you want to donate $${data.amount}?`,
@@ -22,15 +29,21 @@ const SupportUs = () => {
       showCancelButton: true,
       confirmButtonText: "Yes, donate!",
       cancelButtonText: "Cancel",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        // TODO: Integrate payment gateway here
-        Swal.fire(
-          "Thank You!",
-          "Your donation has been received successfully.",
-          "success"
-        );
-        reset();
+        try {
+          const res = await axiosSecure.post("/create-checkout-session", {
+            name: data.name,
+            email: data.email,
+            amount: data.amount,
+          });
+
+          // Redirect to Stripe Checkout
+          window.location.href = res.data.url;
+        } catch (error) {
+          console.error(error);
+          Swal.fire("Error", "Payment initiation failed", "error");
+        }
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire("Cancelled", "Your donation was not processed.", "info");
       }
@@ -44,7 +57,8 @@ const SupportUs = () => {
           Support Us
         </h2>
         <p className="text-gray-700 text-center mb-8">
-          Your monetary contribution helps us run our <span className="text-red-500">BloodHeros</span>  and save lives.
+          Your monetary contribution helps us run our{" "}
+          <span className="text-red-500">BloodHeros</span> and save lives.
           Every donation counts!
         </p>
 
@@ -55,13 +69,12 @@ const SupportUs = () => {
             <div className="flex items-center gap-2">
               <User className="w-5 h-5 text-gray-400" />
               <input
-                {...register("name", { required: "Name is required" })}
+                {...register("name")}
                 type="text"
-                placeholder="Your Full Name"
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800"
+                readOnly
+                className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800 bg-gray-100 cursor-not-allowed"
               />
             </div>
-            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
           </div>
 
           {/* Donor Email */}
@@ -70,16 +83,12 @@ const SupportUs = () => {
             <div className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-gray-400" />
               <input
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
-                })}
+                {...register("email")}
                 type="email"
-                placeholder="your@email.com"
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800"
+                readOnly
+                className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800 bg-gray-100 cursor-not-allowed"
               />
             </div>
-            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
 
           {/* Donation Amount */}
@@ -90,7 +99,7 @@ const SupportUs = () => {
               <input
                 {...register("amount", {
                   required: "Amount is required",
-                  min: { value: 1, message: "Minimum $1" }
+                  min: { value: 1, message: "Minimum $1" },
                 })}
                 type="number"
                 placeholder="Enter amount"
@@ -101,9 +110,10 @@ const SupportUs = () => {
                 min={1}
               />
             </div>
-            {errors.amount && <p className="text-red-500 text-sm">{errors.amount.message}</p>}
+            {errors.amount && (
+              <p className="text-red-500 text-sm">{errors.amount.message}</p>
+            )}
           </div>
-
 
           {/* Submit Button */}
           <button

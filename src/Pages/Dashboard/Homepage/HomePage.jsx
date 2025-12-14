@@ -86,9 +86,9 @@ const HomePage = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            request.status === 'inprogress' ? 'bg-blue-100 text-blue-800' :
-                              request.status === 'done' ? 'bg-green-100 text-green-800' :
-                                request.status === 'canceled' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                          request.status === 'inprogress' ? 'bg-blue-100 text-blue-800' :
+                            request.status === 'done' ? 'bg-green-100 text-green-800' :
+                              request.status === 'canceled' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
                           }`}
                       >
                         {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
