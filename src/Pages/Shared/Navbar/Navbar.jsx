@@ -36,6 +36,16 @@ const Navbar = () => {
                All Blood Donation Requests
             </NavLink>
         </li>
+        <li>
+            <NavLink
+                to="/supportDonation"
+                className={({ isActive }) =>
+                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
+                }
+            >
+               All Support Donation 
+            </NavLink>
+        </li>
     </>;
     const { user, logOut } = useAuth();
     const handleLogout = () => {

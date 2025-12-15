@@ -20,6 +20,7 @@ import ViewDetails from "../Components/ViewDetails/ViewDetails";
 import SupportUs from "../Components/SupportUs/SupportUs";
 import PaymentSuccess from "../Pages/Payment/PaymentSuccess";
 import PaymentCanceled from "../Pages/Payment/PaymentCanceled";
+import AllSupportDonation from "../Pages/AllSupportDonation/AllSupportDonation";
 
 
 export const router = createBrowserRouter([
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path:"myprofile",
         Component:MyProfile
+      },
+      {
+        path:"supportDonation",
+        Component:AllSupportDonation
       },
       {
         path:"requests/:id",
