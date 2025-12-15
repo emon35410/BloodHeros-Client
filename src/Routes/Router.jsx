@@ -18,6 +18,8 @@ import BloodRequest from "../Pages/Dashboard/Blood_Request/BloodRequest";
 import MyBloodRequest from "../Pages/Dashboard/My_Blood_Request/MyBloodRequest";
 import ViewDetails from "../Components/ViewDetails/ViewDetails";
 import SupportUs from "../Components/SupportUs/SupportUs";
+import PaymentSuccess from "../Pages/Payment/PaymentSuccess";
+import PaymentCanceled from "../Pages/Payment/PaymentCanceled";
 
 
 export const router = createBrowserRouter([
@@ -57,6 +59,14 @@ export const router = createBrowserRouter([
       {
         path:"supportus",
         element:<PrivateRoutes><SupportUs></SupportUs></PrivateRoutes>
+      },
+      {
+        path: "payment-success",
+        element:<PrivateRoutes><PaymentSuccess></PaymentSuccess></PrivateRoutes>
+      },
+      {
+        path: "payment-canceled",
+        Component: PaymentCanceled
       },
     ]
   },

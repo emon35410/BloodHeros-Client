@@ -4,10 +4,12 @@ import { CreditCard, User, Mail, DollarSign } from "lucide-react";
 import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
 import useAxiousSecure from "../../Hooks/useAxiousSecure";
+import { nanoid } from "nanoid";
 
 const SupportUs = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiousSecure();
+  const donationTrackingId = nanoid(12);
 
   const {
     register,
@@ -36,8 +38,8 @@ const SupportUs = () => {
             name: data.name,
             email: data.email,
             amount: data.amount,
+            donationTrackingId
           });
-
           // Redirect to Stripe Checkout
           window.location.href = res.data.url;
         } catch (error) {
