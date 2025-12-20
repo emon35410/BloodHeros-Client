@@ -12,15 +12,25 @@ import {
 } from 'lucide-react';
 import useAuth from '../../Hooks/useAuth';
 import useAxiosSecure from '../../Hooks/useAxiousSecure';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
 
 const MyProfile = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
   const [isEditing, setIsEditing] = useState(false);
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      easing: 'ease-in-out',
+      once: true,
+    });
+  }, []);
+
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-  /* 🔒 READ-ONLY MEMBER SINCE (AUTH METADATA ONLY) */
   const memberSince = user?.metadata?.creationTime
     ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -40,7 +50,7 @@ const MyProfile = () => {
 
   const [editedData, setEditedData] = useState({ ...profileData });
 
-  /* Fetch donor data (NO JOIN DATE, NO AVATAR UPDATE) */
+  /* Fetch donor data */
   useEffect(() => {
     const fetchDonorData = async () => {
       try {
@@ -87,7 +97,7 @@ const MyProfile = () => {
     setEditedData(prev => ({ ...prev, [field]: value }));
   };
 
-  /* PATCH ONLY EDITABLE FIELDS */
+ 
   const handleSave = async () => {
     try {
       await axiosSecure.patch(`/donors/${user?.email}`, {
@@ -107,7 +117,7 @@ const MyProfile = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div data-aos="fade-down" className="flex items-center justify-between">
         <div className="my-6 ml-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
             My Profile
@@ -144,11 +154,11 @@ const MyProfile = () => {
       </div>
 
       {/* Profile Card */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div data-aos="zoom-out" className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-red-500 to-pink-600"></div>
 
         <div className="px-8 pb-8">
-    \
+          \
           <div className="relative -mt-16 mb-6">
             <div className="w-32 h-32 rounded-full border-4 border-white bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center text-white text-4xl font-bold overflow-hidden">
               {profileData.avatar ? (
@@ -172,7 +182,7 @@ const MyProfile = () => {
 
           {/* Profile Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-         
+
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
                 Personal Information
