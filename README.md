@@ -41,4 +41,10 @@ Stripe for payments
 Cors, Dotenv
 
 
+Live Link : https://bloodherosemon.netlify.app/
+Git Repo
+Client: https://github.com/emon35410/BloodHeros-Client.git
+Server: https://github.com/emon35410/BloodHeros-Server.git
+
+
 
