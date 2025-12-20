@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { CreditCard, User, Mail, DollarSign } from "lucide-react";
 import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
 import useAxiousSecure from "../../Hooks/useAxiousSecure";
 import { nanoid } from "nanoid";
+import Aos from "aos";
+import 'aos/dist/aos.css';
 
 const SupportUs = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiousSecure();
   const donationTrackingId = nanoid(12);
-
+  useEffect(() => {
+    Aos.init({ duration: 1000, once: true });
+  }, []);
   const {
     register,
     handleSubmit,
@@ -54,7 +58,7 @@ const SupportUs = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 flex items-center justify-center py-10">
-      <div className="max-w-2xl w-full bg-white shadow-lg rounded-xl p-8 border border-gray-200">
+      <div data-aos="fade-up" className="max-w-2xl w-full bg-white shadow-lg rounded-xl p-8 border border-gray-200">
         <h2 className="text-3xl font-bold text-red-600 mb-6 text-center">
           Support Us
         </h2>

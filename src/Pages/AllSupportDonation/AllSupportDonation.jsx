@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import useAxiousSecure from "../../Hooks/useAxiousSecure";
+import Aos from "aos";
+import 'aos/dist/aos.css';
 
 const AllSupportDonation = () => {
     const axiosSecure = useAxiousSecure();
     const [donations, setDonations] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    useEffect(() => {
+        Aos.init({ duration: 1000, once: true });
+    }, []);
     useEffect(() => {
         axiosSecure.get("/donations")
             .then(res => {
@@ -29,12 +33,13 @@ const AllSupportDonation = () => {
         );
     }
 
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 p-4 md:p-6">
-            <div className="max-w-7xl mx-auto">
+            <div  className="max-w-7xl mx-auto">
 
                 {/* Header Section */}
-                <div className="mb-6 flex justify-center items-center md:mb-8">
+                <div data-aos="fade-left" className="mb-6 flex justify-center items-center md:mb-8">
                     <div className="flex items-center gap-3 mb-2 ">
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
                             <span className="text-xl md:text-2xl">💖</span>
@@ -47,7 +52,7 @@ const AllSupportDonation = () => {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="flex justify-center items-center mb-6 md:mb-8">
+                <div data-aos="fade-right" className="flex justify-center items-center mb-6 md:mb-8">
                     <div className="w-full max-w-sm bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:scale-105">
                         <div className="flex items-center justify-between">
                             <div>
@@ -67,7 +72,7 @@ const AllSupportDonation = () => {
 
 
                 {/* Table Section */}
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div data-aos="fade-down" className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gradient-to-r from-rose-500 to-pink-600 text-white">

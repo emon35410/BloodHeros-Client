@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import useAxiousSecure from '../../Hooks/useAxiousSecure';
+import { useEffect } from 'react';
+import Aos from 'aos';
+import 'aos/dist/aos.css';
 
 
 const BloodDonationRequest = () => {
@@ -33,6 +36,9 @@ const BloodDonationRequest = () => {
             return res.data;
         }
     });
+    useEffect(() => {
+        Aos.init({ duration: 1000, once: true });
+    }, []);
 
     // Filter requests based on status
     const filteredRequests = useMemo(() => {
@@ -92,7 +98,7 @@ const BloodDonationRequest = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className='my-3'>
+            <div data-aos="fade-up" className='my-3'>
                 <h1 className="text-3xl text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-pink-500 to-purple-600">
                     All Blood Donation Requests
                 </h1>
@@ -108,7 +114,7 @@ const BloodDonationRequest = () => {
 
 
             {/* Filter Buttons */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div data-aos="fade-left" className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
                     <Filter className="w-5 h-5 text-gray-600" />
                     <h3 className="text-lg font-semibold text-gray-800">Filter by Status</h3>
@@ -164,7 +170,7 @@ const BloodDonationRequest = () => {
 
             {/* Requests Table */}
             {currentRequests.length > 0 ? (
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div data-aos="fade-right" className="bg-white rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b">
@@ -219,7 +225,7 @@ const BloodDonationRequest = () => {
                                         <td className="px-6 py-4">
                                             {getStatusBadge(request.status)}
                                         </td>
-                                        
+
                                         <td className="px-6 py-4">
                                             <Link
                                                 to={`/requests/${request._id}`}

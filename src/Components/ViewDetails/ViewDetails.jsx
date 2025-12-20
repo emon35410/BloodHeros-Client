@@ -1,5 +1,6 @@
-import React from 'react';
-import { useLoaderData, useParams, useNavigate } from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router';
+import useAxiousSecure from '../../Hooks/useAxiousSecure';
 import {
     ArrowLeft,
     User,
@@ -17,11 +18,31 @@ import {
 } from 'lucide-react';
 
 const ViewDetails = () => {
-    const allRequests = useLoaderData();
     const { id } = useParams();
     const navigate = useNavigate();
+    const axiosSecure = useAxiousSecure();
+    const [request, setRequest] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const request = allRequests.find(req => req._id === id);
+    useEffect(() => {
+        axiosSecure.get(`/donorRequest/${id}`)
+            .then(res => {
+                setRequest(res.data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
+    }, [id, axiosSecure]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex justify-center items-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+            </div>
+        );
+    }
 
     if (!request) {
         return (

@@ -4,6 +4,8 @@ import useAuth from "../../../Hooks/useAuth";
 import { Calendar, Clock } from "lucide-react";
 import useAxiousSecure from "../../../Hooks/useAxiousSecure";
 import Swal from "sweetalert2";
+import Aos from "aos";
+import 'aos/dist/aos.css';
 
 const BloodRequest = () => {
     const { user } = useAuth();
@@ -11,7 +13,9 @@ const BloodRequest = () => {
     const [upazilas, setUpazilas] = useState([]);
     const [filteredUpazila, setFilteredUpazila] = useState([]);
     const axiousSecure = useAxiousSecure();
-
+    useEffect(() => {
+        Aos.init({ duration: 1000, once: true });
+    }, []);
     const {
         register,
         handleSubmit,
@@ -21,7 +25,6 @@ const BloodRequest = () => {
 
     const selectedDistrict = watch("district");
 
-    // Load District + Upazila
     useEffect(() => {
         const load = async () => {
             const d = await fetch("/districts.json").then((r) => r.json());
@@ -32,7 +35,6 @@ const BloodRequest = () => {
         load();
     }, []);
 
-    // Filter upazila based on district
     useEffect(() => {
         if (selectedDistrict) {
             const filtered = upazilas.filter(
@@ -44,20 +46,18 @@ const BloodRequest = () => {
         }
     }, [selectedDistrict, upazilas]);
 
-    // Submit Form
     const onSubmit = (data) => {
         const finalTime = `${data.hour}:${data.minute} ${data.ampm}`;
 
         const finalData = {
             ...data,
-            donationTime: finalTime,        // Add formatted time
+            donationTime: finalTime, 
             requesterName: user?.displayName,
             requesterEmail: user?.email,
             status: "pending",
         };
         console.log(finalData);
 
-        // SweetAlert confirmation
         Swal.fire({
             title: "Are you sure?",
             text: "Do you want to submit this blood donation request?",
@@ -98,14 +98,12 @@ const BloodRequest = () => {
 
 
     return (
-        <div className="max-w-3xl mx-auto bg-white shadow-md p-8 rounded-xl border border-gray-200">
+        <div data-aos="fade-up" className="max-w-3xl mx-auto bg-white shadow-md p-8 rounded-xl border border-gray-200">
             <h2 className="text-3xl font-bold text-red-600 mb-8 text-center">
                 Create Blood Donation Request
             </h2>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
-                {/* INPUT WRAPPER */}
                 <div className="grid md:grid-cols-2 gap-5">
 
                     {/* Requester Name */}
@@ -264,13 +262,11 @@ const BloodRequest = () => {
                     </div>
 
 
-                    {/* Donation Time (12-hour format with AM/PM) */}
+                    {/* Donation Time */}
                     <div>
                         <label className="font-semibold text-gray-700">Donation Time</label>
 
                         <div className="grid grid-cols-3 gap-2 mt-1">
-
-                            {/* Hour (1–12) */}
                             <select
                                 {...register("hour", { required: "Hour required" })}
                                 className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
@@ -282,8 +278,6 @@ const BloodRequest = () => {
                                     </option>
                                 ))}
                             </select>
-
-                            {/* Minute (0–59) */}
                             <select
                                 {...register("minute", { required: "Minute required" })}
                                 className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
@@ -296,7 +290,6 @@ const BloodRequest = () => {
                                 ))}
                             </select>
 
-                            {/* AM / PM */}
                             <select
                                 {...register("ampm", { required: "AM/PM required" })}
                                 className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"

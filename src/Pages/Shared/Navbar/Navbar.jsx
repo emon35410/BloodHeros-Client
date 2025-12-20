@@ -115,12 +115,12 @@ const Navbar = () => {
                                         />
                                     </div>
 
-                                    {/* BLOOD THEME DROPDOWN MENU */}
+                                   
                                     <ul
                                         tabIndex={0}
                                         className="dropdown-content menu bg-white rounded-xl shadow-xl w-60 mt-3 p-3 border border-red-200"
                                     >
-                                        {/* DASHBOARD */}
+                                       
                                         <li>
                                             <Link
                                                 to="/dashboard"

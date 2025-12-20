@@ -61,7 +61,7 @@ const Collaborators = () => {
 
     return (
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-            {/* Background Decoration */}
+       
             <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
                 <div className="absolute top-20 left-10 w-96 h-96 bg-red-500 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>

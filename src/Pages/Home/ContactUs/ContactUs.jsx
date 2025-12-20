@@ -2,19 +2,27 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import 'aos/dist/aos.css';
 import Aos from 'aos';
+import Swal from 'sweetalert2';
 
 const ContactUs = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
     const onSubmit = (data) => {
         console.log('Form submitted:', data);
-        // Add your form submission logic here
-        alert('Thank you for contacting us! We will get back to you soon.');
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Thank You!',
+            text: 'Thank you for contacting us! We will get back to you soon.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#16a34a', 
+        });
+
         reset();
     };
     useEffect(() => {
-            Aos.init({ duration: 1000, once: true });
-        }, []);
+        Aos.init({ duration: 1000, once: true });
+    }, []);
 
 
     const contactInfo = [
@@ -93,7 +101,7 @@ const ContactUs = () => {
 
                 {/* Contact Form and Info */}
                 <div className="grid lg:grid-cols-2 gap-12 items-start">
-                    {/* Contact Form */}
+
                     <div data-aos="fade-up" className="bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-gray-100">
                         <h3 className="text-3xl font-bold text-gray-900 mb-2">
                             Send Us a Message
@@ -220,9 +228,8 @@ const ContactUs = () => {
                         </div>
                     </div>
 
-                    {/* Additional Info & Map */}
                     <div className="space-y-8">
-                        {/* Emergency Banner */}
+
                         <div data-aos="fade-down" className="bg-gradient-to-r from-red-500 to-pink-500 rounded-3xl p-8 text-white shadow-xl">
                             <div className="flex items-start gap-4">
                                 <div className="text-5xl">🚨</div>

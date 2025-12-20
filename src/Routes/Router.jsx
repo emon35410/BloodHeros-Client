@@ -5,7 +5,6 @@ import ErrorPage from "../Components/ErrorPage/ErrorPage";
 import Loading from "../Components/Loading/Loading";
 import SearchDonor from "../Pages/SearchDonor/SearchDonor";
 import BloodDonationRequest from "../Pages/Blood-Donation-Request/BloodDonationRequest";
-import RequestDetails from "../Pages/Request-Details/RequestDetails";
 import AuthLayout from "../Layouts/AuthLayout";
 import Register from "../Pages/Auth/Register/Register";
 import Login from "../Pages/Auth/Login/Login";
@@ -21,6 +20,10 @@ import SupportUs from "../Components/SupportUs/SupportUs";
 import PaymentSuccess from "../Pages/Payment/PaymentSuccess";
 import PaymentCanceled from "../Pages/Payment/PaymentCanceled";
 import AllSupportDonation from "../Pages/AllSupportDonation/AllSupportDonation";
+import AllUsers from "../Pages/Dashboard/All_Users/AllUsers";
+import AllBloodRequest from "../Pages/Dashboard/All_Blood_Request/AllBloodRequest";
+import AdminRoutes from "./AdminRoutes";
+import AdminOrVolunteerRoute from "./AdminOrVolunteerRoute";
 
 
 export const router = createBrowserRouter([
@@ -45,29 +48,29 @@ export const router = createBrowserRouter([
 
       },
       {
-        path:"location",
-        Component:Location
+        path: "location",
+        Component: Location
       },
       {
-        path:"myprofile",
-        Component:MyProfile
+        path: "myprofile",
+        Component: MyProfile
       },
       {
-        path:"supportDonation",
-        Component:AllSupportDonation
+        path: "supportDonation",
+        Component: AllSupportDonation
       },
       {
-        path:"requests/:id",
-        loader: async()=> await fetch("http://localhost:3000/donorRequest"),
-        Component:ViewDetails
+        path: "requests/:id",
+        element: <PrivateRoutes><ViewDetails></ViewDetails></PrivateRoutes>
       },
+
       {
-        path:"supportus",
-        element:<PrivateRoutes><SupportUs></SupportUs></PrivateRoutes>
+        path: "supportus",
+        element: <PrivateRoutes><SupportUs></SupportUs></PrivateRoutes>
       },
       {
         path: "payment-success",
-        element:<PrivateRoutes><PaymentSuccess></PaymentSuccess></PrivateRoutes>
+        element: <PrivateRoutes><PaymentSuccess></PaymentSuccess></PrivateRoutes>
       },
       {
         path: "payment-canceled",
@@ -89,12 +92,12 @@ export const router = createBrowserRouter([
         loader: async () => {
           const [districtsRes, upazilasRes] = await Promise.all([
             fetch("/districts.json"),
-            fetch("/upazilas.json")  
+            fetch("/upazilas.json")
           ]);
 
           return {
             districts: await districtsRes.json(),
-            upazilas: await upazilasRes.json() 
+            upazilas: await upazilasRes.json()
           };
         },
         Component: Register
@@ -102,20 +105,28 @@ export const router = createBrowserRouter([
     ]
   },
   {
-    path:"dashboard",
-    element:<PrivateRoutes><DashboardLayout></DashboardLayout></PrivateRoutes>,
-    children:[
+    path: "dashboard",
+    element: <PrivateRoutes><DashboardLayout></DashboardLayout></PrivateRoutes>,
+    children: [
       {
-        index:true,
-        element:<HomePage></HomePage>
+        index: true,
+        element: <HomePage></HomePage>
       },
       {
-        path:"bloodrequest",
-        element:<BloodRequest></BloodRequest>
+        path: "bloodrequest",
+        element: <BloodRequest></BloodRequest>
       },
       {
-        path:"myrequests",
-        element:<MyBloodRequest></MyBloodRequest>
+        path: "myrequests",
+        element: <MyBloodRequest></MyBloodRequest>
+      },
+      {
+        path: "allusers",
+        element: <AdminRoutes><AllUsers></AllUsers></AdminRoutes>
+      },
+      {
+        path: "allrequest",
+        element: <AdminOrVolunteerRoute><AllBloodRequest></AllBloodRequest></AdminOrVolunteerRoute>
       }
     ]
   }
