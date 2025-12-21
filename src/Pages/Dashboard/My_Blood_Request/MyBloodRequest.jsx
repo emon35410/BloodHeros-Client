@@ -278,103 +278,87 @@ const MyBloodRequest = () => {
 
             {/*  EDIT MODAL */}
             {showEditModal && selectedRequest && (
-                <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-xl w-full">
-                        <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-                            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                                Edit Donation Request
-                            </h3>
-                            <button
-                                onClick={() => setShowEditModal(false)}
-                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                            >
-                                <X className="w-6 h-6" />
+                        <div className="flex justify-between items-center p-6 border-b">
+                            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Edit Donation Request</h3>
+                            <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <X />
                             </button>
                         </div>
 
                         <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Recipient Name
-                                    </label>
-                                    <input
-                                        name="recipientName"
-                                        defaultValue={selectedRequest.recipientName}
-                                        className="w-full px-4 py-2 border rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
-                                        required
-                                    />
-                                </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Hospital Name
-                                    </label>
-                                    <input
-                                        name="hospital"
-                                        defaultValue={selectedRequest.hospital}
-                                        className="w-full px-4 py-2 border rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        name="donationDate"
-                                        defaultValue={selectedRequest.donationDate}
-                                        className="w-full px-4 py-2 border rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Donation Time
-                                    </label>
-                                    <div className="flex gap-1">
-                                        <select className="w-full p-2 border rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700">
-                                            {[...Array(12)].map((_, i) => {
-                                                const val = String(i + 1).padStart(2, '0');
-                                                return <option key={i}>{val}</option>;
-                                            })}
-                                        </select>
-
-                                        <select className="w-full p-2 border rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700">
-                                            {[...Array(60)].map((_, i) => {
-                                                const val = String(i).padStart(2, '0');
-                                                return <option key={i}>{val}</option>;
-                                            })}
-                                        </select>
-
-                                        <select className="w-full p-2 border rounded-lg outline-none font-semibold bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700">
-                                            <option>AM</option>
-                                            <option>PM</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Full Address
-                                </label>
-                                <textarea
-                                    rows="2"
-                                    defaultValue={selectedRequest.address}
-                                    className="w-full px-4 py-2 border rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+                                <input
+                                    name="recipientName"
+                                    defaultValue={selectedRequest.recipientName}
+                                    className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                                     required
                                 />
+
+                                <input
+                                    name="hospital"
+                                    defaultValue={selectedRequest.hospital}
+                                    className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+                                    required
+                                />
+
+                                <input
+                                    type="date"
+                                    name="donationDate"
+                                    defaultValue={selectedRequest.donationDate}
+                                    className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+                                    required
+                                />
+
+                                <div className="flex gap-1">
+                                    <select
+                                        name="hour"
+                                        defaultValue={selectedRequest.donationTime?.split(':')[0] || '01'}
+                                        className="w-full p-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+                                    >
+                                        {[...Array(12)].map((_, i) => {
+                                            const v = String(i + 1).padStart(2, '0');
+                                            return <option key={i} value={v}>{v}</option>;
+                                        })}
+                                    </select>
+
+                                    <select
+                                        name="minute"
+                                        defaultValue={selectedRequest.donationTime?.split(':')[1]?.split(' ')[0] || '00'}
+                                        className="w-full p-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+                                    >
+                                        {[...Array(60)].map((_, i) => {
+                                            const v = String(i).padStart(2, '0');
+                                            return <option key={i} value={v}>{v}</option>;
+                                        })}
+                                    </select>
+
+                                    <select
+                                        name="ampm"
+                                        defaultValue={selectedRequest.donationTime?.split(' ')[1] || 'AM'}
+                                        className="w-full p-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+                                    >
+                                        <option value="AM">AM</option>
+                                        <option value="PM">PM</option>
+                                    </select>
+                                </div>
                             </div>
+
+                            <textarea
+                                name="address"
+                                defaultValue={selectedRequest.address}
+                                rows="2"
+                                className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+                                required
+                            />
 
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setShowEditModal(false)}
-                                    className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-medium rounded-lg"
+                                    className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                                 >
                                     Cancel
                                 </button>
@@ -382,7 +366,7 @@ const MyBloodRequest = () => {
                                 <button
                                     type="submit"
                                     disabled={updateMutation.isPending}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50"
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
                                 >
                                     {updateMutation.isPending ? 'Updating...' : 'Save Changes'}
                                 </button>
@@ -390,8 +374,9 @@ const MyBloodRequest = () => {
                         </form>
                     </div>
                 </div>
-
             )}
+
+
 
             {/* Delete Modal */}
             {showDeleteModal && (
