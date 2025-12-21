@@ -16,6 +16,9 @@ import {
     AlertCircle,
     Home
 } from 'lucide-react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
 
 const ViewDetails = () => {
     const { id } = useParams();
@@ -23,6 +26,13 @@ const ViewDetails = () => {
     const axiosSecure = useAxiousSecure();
     const [request, setRequest] = useState(null);
     const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-in-out',
+            once: true,
+        });
+    }, []);
 
     useEffect(() => {
         axiosSecure.get(`/donorRequest/${id}`)
@@ -119,7 +129,7 @@ const ViewDetails = () => {
                 </button>
 
                 {/* Header Card */}
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+                <div data-aos="fade-down" className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
                     <div className="bg-gradient-to-r from-red-500 to-pink-600 px-8 py-6 flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-white mb-2">Blood Donation Request</h1>
@@ -141,7 +151,7 @@ const ViewDetails = () => {
                 </div>
 
                 {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div data-aos="zoom-in" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Recipient Information */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center gap-2 mb-6 pb-4 border-b">
@@ -217,7 +227,7 @@ const ViewDetails = () => {
                 </div>
 
                 {/* Donation Schedule */}
-                <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+                <div data-aos="zoom-out" className="bg-white rounded-xl shadow-lg p-6 mt-6">
                     <div className="flex items-center gap-2 mb-6 pb-4 border-b">
                         <Calendar className="w-6 h-6 text-red-600" />
                         <h2 className="text-xl font-bold text-gray-800">Donation Schedule</h2>
@@ -252,7 +262,7 @@ const ViewDetails = () => {
                 </div>
 
                 {/* Additional Information */}
-                <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+                <div data-aos="fade-right" className="bg-white rounded-xl shadow-lg p-6 mt-6">
                     <div className="flex items-center gap-2 mb-6 pb-4 border-b">
                         <MessageSquare className="w-6 h-6 text-red-600" />
                         <h2 className="text-xl font-bold text-gray-800">Additional Message</h2>
@@ -268,7 +278,7 @@ const ViewDetails = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mt-6 bg-white rounded-xl shadow-lg p-6 flex flex-col sm:flex-row gap-4 justify-center">
+                <div  data-aos="flip-left" className="mt-6 bg-white rounded-xl shadow-lg p-6 flex flex-col sm:flex-row gap-4 justify-center">
                     <a
                         href={`mailto:${request.requesterEmail}?subject=Blood Donation Request - ${request.bloodGroup}&body=Hi ${request.requesterName}, I am interested in donating blood for your request.`}
                         className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-center"

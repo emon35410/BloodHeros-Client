@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Aos from 'aos';
 import 'aos/dist/aos.css';
+import { Link } from 'react-router';
 
 
 
@@ -61,17 +62,17 @@ const Banner = () => {
                         </div>
                     </div>
                     <div data-aos="fade-right" className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="group relative px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-full shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-110 flex items-center gap-3">
+                        <Link to="/dashboard/bloodrequest" className="group relative px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-full shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-110 flex items-center gap-3">
                             <span className="text-xl">❤️</span>
                             <span>Donate Blood Now</span>
                             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
-                        </button>
-                        <button className="px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full border-2 border-white/30 hover:bg-white/20 transition-all duration-300 hover:scale-105 flex items-center gap-3">
+                        </Link>
+                        <Link to="/searchDonor" className="px-4 py-2 bg-white/10 backdrop-blur-md text-white font-semibold rounded-full border-2 border-white/30 hover:bg-white/20 transition-all duration-300 hover:scale-105 flex items-center gap-3">
                             <span className="text-xl">🔍</span>
                             <span>Find Blood</span>
-                        </button>
+                        </Link>
                     </div>
 
                     <div data-aos="fade-left" className="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/70 text-sm">

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router';
 import {
     Edit,
@@ -19,17 +19,18 @@ import {
     X
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
 import useAxiousSecure from '../../../Hooks/useAxiousSecure';
 import toast from 'react-hot-toast';
 import useRole from '../../../Hooks/useRole';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const AllBloodRequest = () => {
     const axiousSecure = useAxiousSecure();
     const queryClient = useQueryClient();
     const { role } = useRole()
 
-    // --- States ---
+    //States
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteRequestId, setDeleteRequestId] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
@@ -77,7 +78,14 @@ const AllBloodRequest = () => {
         onError: () => toast.error('Failed to delete request')
     });
 
-  
+    useEffect(() => {
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-in-out',
+            once: true,
+        });
+    }, []);
+
     const handleEditSubmit = (e) => {
         e.preventDefault();
         const form = e.target;
@@ -90,7 +98,7 @@ const AllBloodRequest = () => {
             donationDate: form.donationDate.value,
             donationTime: time,
             address: form.address.value,
-            status: form.status.value, 
+            status: form.status.value,
         };
         updateMutation.mutate(updatedInfo);
     };
@@ -131,7 +139,7 @@ const AllBloodRequest = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div data-aos="fade-down" className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-800">All Blood Donation Requests</h1>
                     <p className="text-gray-600 mt-1">Showing {filteredRequests.length} requests</p>
@@ -139,7 +147,7 @@ const AllBloodRequest = () => {
             </div>
 
             {/* Filter Section */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+            <div data-aos="zoom-in" className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                 <div className="flex items-center gap-2 mb-4">
                     <Filter className="w-5 h-5 text-gray-600" />
                     <h3 className="text-lg font-semibold text-gray-800">Filter by Status</h3>
@@ -159,7 +167,7 @@ const AllBloodRequest = () => {
 
             {/* Table */}
             {currentRequests.length > 0 ? (
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                <div data-aos="fade-up" className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b">
@@ -212,7 +220,7 @@ const AllBloodRequest = () => {
 
             {/* EDIT MODAL*/}
             {showEditModal && selectedRequest && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                <div data-aos="zoom-in" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-xl w-full overflow-hidden">
                         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Edit Donation Request</h3>
@@ -333,7 +341,7 @@ const AllBloodRequest = () => {
             )}
             {/* DELETE MODAL */}
             {showDeleteModal && role == 'admin' && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+                <div data-aos="zoom-out" className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-8 text-center">
                         <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Delete Request?</h3>

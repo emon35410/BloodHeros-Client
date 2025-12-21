@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import useAxiousSecure from '../../../Hooks/useAxiousSecure';
 import { Search, UserCheck, UserX, Shield, Users } from 'lucide-react';
 import Swal from 'sweetalert2';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const AllUsers = () => {
     const axiosSecure = useAxiousSecure();
@@ -10,6 +12,14 @@ const AllUsers = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
+
+    useEffect(() => {
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-in-out',
+            once: true,
+        });
+    }, []);
 
     const fetchUsers = async () => {
         try {
@@ -117,7 +127,7 @@ const AllUsers = () => {
     return (
         <div className="p-6 max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-6">
+            <div data-aos="fade-down" className="mb-6">
                 <h2 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
                     <Users className="w-8 h-8 text-blue-600" />
                     User Management
@@ -126,7 +136,7 @@ const AllUsers = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div  data-aos="zoom-in" className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
                     <p className="text-sm text-gray-600 mb-1">Total Users</p>
                     <p className="text-2xl font-bold text-blue-700">{users.length}</p>
@@ -152,7 +162,7 @@ const AllUsers = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+            <div data-aos="fade-right" className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Search */}
                     <div className="relative">
@@ -192,7 +202,7 @@ const AllUsers = () => {
             </div>
 
             {/* Users Table */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div data-aos="fade-left" className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 {filteredUsers.length === 0 ? (
                     <div className="text-center py-12">
                         <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -339,7 +349,7 @@ const AllUsers = () => {
 
             {/* Results count */}
             {filteredUsers.length > 0 && (
-                <div className="mt-4 text-sm text-gray-600 text-center">
+                <div  data-aos="flip-left" className="mt-4 text-sm text-gray-600 text-center">
                     Showing {filteredUsers.length} of {users.length} users
                 </div>
             )}
