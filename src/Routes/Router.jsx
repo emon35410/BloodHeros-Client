@@ -24,6 +24,10 @@ import AllUsers from "../Pages/Dashboard/All_Users/AllUsers";
 import AllBloodRequest from "../Pages/Dashboard/All_Blood_Request/AllBloodRequest";
 import AdminRoutes from "./AdminRoutes";
 import AdminOrVolunteerRoute from "./AdminOrVolunteerRoute";
+import BloodDonate from "../Pages/Donate_Blood/BloodDonate";
+import AllDonateRequest from "../Pages/Dashboard/All_Donate_Request/AllDonateRequest";
+import DonorDetailsView from "../Components/View/DonorDetailsView";
+import DonorRequestDonation from "../Pages/Donor_Request_donation/DonorRequestDonation";
 
 
 export const router = createBrowserRouter([
@@ -48,6 +52,10 @@ export const router = createBrowserRouter([
 
       },
       {
+        path:"donorBloodRequest",
+        element:<PrivateRoutes><DonorRequestDonation></DonorRequestDonation></PrivateRoutes>
+      },
+      {
         path: "location",
         Component: Location
       },
@@ -63,6 +71,10 @@ export const router = createBrowserRouter([
         path: "requests/:id",
         element: <PrivateRoutes><ViewDetails></ViewDetails></PrivateRoutes>
       },
+      {
+        path: "donateRequest/:id",
+        element: <PrivateRoutes><DonorDetailsView></DonorDetailsView></PrivateRoutes>
+      },
 
       {
         path: "supportus",
@@ -76,6 +88,10 @@ export const router = createBrowserRouter([
         path: "payment-canceled",
         Component: PaymentCanceled
       },
+      {
+        path:"donateblood",
+        element:<PrivateRoutes><BloodDonate></BloodDonate></PrivateRoutes>
+      }
     ]
   },
   {
@@ -127,6 +143,10 @@ export const router = createBrowserRouter([
       {
         path: "allrequest",
         element: <AdminOrVolunteerRoute><AllBloodRequest></AllBloodRequest></AdminOrVolunteerRoute>
+      },
+      {
+        path: "alldonaterequest",
+        element: <AdminOrVolunteerRoute><AllDonateRequest></AllDonateRequest></AdminOrVolunteerRoute>
       }
     ]
   }

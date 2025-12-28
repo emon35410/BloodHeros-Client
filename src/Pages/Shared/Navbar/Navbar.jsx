@@ -28,6 +28,16 @@ const Navbar = () => {
         </li>
         <li>
             <NavLink
+                to="/donorBloodRequest"
+                className={({ isActive }) =>
+                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
+                }
+            >
+                 Donor Requests
+            </NavLink>
+        </li>
+        <li>
+            <NavLink
                 to="/bloodDonationRequest"
                 className={({ isActive }) =>
                     `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
@@ -72,7 +82,7 @@ const Navbar = () => {
                             {links}
                         </ul>
                     </div>
-                    <Link className="btn btn-ghost  flex items-center gap-2 h-auto py-2">
+                    <Link className="btn btn-ghost  flex items-center gap-1 h-auto py-1">
 
                         <img
                             src={logo}
@@ -88,7 +98,7 @@ const Navbar = () => {
 
                 </div>
                 <div className="navbar-center hidden lg:flex">
-                    <ul className="menu menu-horizontal px-1 gap-2">
+                    <ul className="menu menu-horizontal px-1 ">
                         {links}
 
                     </ul>

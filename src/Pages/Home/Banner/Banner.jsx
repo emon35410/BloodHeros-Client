@@ -62,7 +62,7 @@ const Banner = () => {
                         </div>
                     </div>
                     <div data-aos="fade-right" className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link to="/dashboard/bloodrequest" className="group relative px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-full shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-110 flex items-center gap-3">
+                        <Link to="/donateblood" className="group relative px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-full shadow-2xl hover:shadow-red-500/50 transition-all duration-300 hover:scale-110 flex items-center gap-3">
                             <span className="text-xl">❤️</span>
                             <span>Donate Blood Now</span>
                             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

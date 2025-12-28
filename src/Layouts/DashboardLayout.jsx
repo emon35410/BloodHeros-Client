@@ -90,6 +90,21 @@ const DashboardLayout = () => {
                                     <span className="font-medium">My Blood Requests</span>
                                 </Link>
                             </li>
+
+                            {(role === 'admin' || role === 'volunteer') && (
+                                <li>
+                                    <Link
+                                        to="/dashboard/alldonaterequest"
+                                        onClick={() => setSidebarOpen(false)}
+                                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${location.pathname === '/dashboard/alldonaterequest'
+                                            ? 'bg-red-50 text-red-600'
+                                            : 'text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <span className="font-medium">🦸‍♀️ All Donate Request</span>
+                                    </Link>
+                                </li>
+                            )}
                             {/* All Users only for admin */}
                             {role === 'admin' && (
                                 <li>
@@ -123,6 +138,7 @@ const DashboardLayout = () => {
                                     </Link>
                                 </li>
                             )}
+
 
                         </ul>
                     </nav>
