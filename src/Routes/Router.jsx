@@ -28,6 +28,8 @@ import BloodDonate from "../Pages/Donate_Blood/BloodDonate";
 import AllDonateRequest from "../Pages/Dashboard/All_Donate_Request/AllDonateRequest";
 import DonorDetailsView from "../Components/View/DonorDetailsView";
 import DonorRequestDonation from "../Pages/Donor_Request_donation/DonorRequestDonation";
+import AboutUs from "../Components/AboutUs/AboutUs";
+import PrivacyPolicy from "../Components/PrivacyPolicy/PrivacyPolicy";
 
 
 export const router = createBrowserRouter([
@@ -91,6 +93,14 @@ export const router = createBrowserRouter([
       {
         path:"donateblood",
         element:<PrivateRoutes><BloodDonate></BloodDonate></PrivateRoutes>
+      },
+      {
+        path: "about",
+        element:<AboutUs></AboutUs>
+      },
+      {
+        path: "privacy",
+        element:<PrivacyPolicy></PrivacyPolicy>
       }
     ]
   },
