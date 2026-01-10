@@ -2,175 +2,148 @@ import React, { useEffect, useState } from "react";
 import useAxiousSecure from "../../Hooks/useAxiousSecure";
 import Aos from "aos";
 import 'aos/dist/aos.css';
+import { Heart, Mail, Hash, Calendar, DollarSign, Inbox, ArrowUpRight, Clock } from "lucide-react";
 
 const AllSupportDonation = () => {
     const axiosSecure = useAxiousSecure();
     const [donations, setDonations] = useState([]);
     const [loading, setLoading] = useState(true);
+
     useEffect(() => {
-        Aos.init({ duration: 1000, once: true });
+        // Animation duration optimized for better feel
+        Aos.init({ duration: 500, once: true });
     }, []);
+
     useEffect(() => {
-        axiosSecure.get("/donations")
-            .then(res => {
+        const fetchDonations = async () => {
+            try {
+                const res = await axiosSecure.get("/donations");
                 setDonations(res.data);
+            } catch (err) {
+                console.error("Fetch Error:", err);
+            } finally {
                 setLoading(false);
-            })
-            .catch(err => {
-                console.error("Error fetching donations:", err);
-                setLoading(false);
-            });
+            }
+        };
+        fetchDonations();
     }, [axiosSecure]);
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-white to-pink-50">
-                <div className="text-center">
-                    <span className="loading loading-spinner loading-lg text-rose-600"></span>
-                    <p className="mt-4 text-gray-600 font-medium">Loading donations...</p>
-                </div>
+            <div className="min-h-[60vh] flex flex-col items-center justify-center dark:bg-[#020617]">
+                <div className="w-10 h-10 border-4 border-rose-500/10 border-t-rose-500 rounded-full animate-spin"></div>
             </div>
         );
     }
 
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 p-4 md:p-6">
-            <div  className="max-w-7xl mx-auto">
-
-                {/* Header Section */}
-                <div data-aos="fade-left" className="mb-6 flex justify-center items-center md:mb-8">
-                    <div className="flex items-center gap-3 mb-2 ">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                            <span className="text-xl md:text-2xl">💖</span>
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#020617] p-4 md:p-8 transition-colors duration-500">
+            <div className="max-w-7xl mx-auto space-y-6">
+                
+                {/* Header & Stats - Compact UI */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-500/20 group hover:rotate-12 transition-transform">
+                            <Heart className="w-7 h-7 text-white" />
                         </div>
-                        <h2 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
-                            Support Donations
-                        </h2>
+                        <div>
+                            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Support History</h2>
+                            <p className="text-slate-500 dark:text-slate-500 text-[11px] font-bold uppercase tracking-[0.1em]">Verified Contributions: {donations.length}</p>
+                        </div>
                     </div>
-
-                </div>
-
-                {/* Stats Cards */}
-                <div data-aos="fade-right" className="flex justify-center items-center mb-6 md:mb-8">
-                    <div className="w-full max-w-sm bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:scale-105">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 text-xs md:text-sm font-medium mb-1">
-                                    Total Donations
-                                </p>
-                                <p className="text-2xl md:text-3xl font-bold text-gray-800">
-                                    {donations.length}
-                                </p>
-                            </div>
-                            <div className="w-12 h-12 md:w-14 md:h-14 bg-blue-100 rounded-xl flex items-center justify-center">
-                                <span className="text-xl md:text-2xl">📊</span>
-                            </div>
+                    
+                    <div className="hidden md:flex items-center gap-3 px-5 py-2.5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                        <div className="p-2 bg-emerald-500/10 rounded-xl">
+                            <DollarSign className="w-4 h-4 text-emerald-500" />
                         </div>
+                        <span className="text-sm font-black text-slate-700 dark:text-slate-300">Public Support</span>
                     </div>
                 </div>
 
-
-                {/* Table Section */}
-                <div data-aos="fade-down" className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                {/* Table Container */}
+                <div data-aos="fade-up" className="bg-white dark:bg-slate-900/20 rounded-[2.5rem] border border-slate-200 dark:border-white/5 overflow-hidden shadow-sm backdrop-blur-sm">
                     <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gradient-to-r from-rose-500 to-pink-600 text-white">
-                                <tr>
-                                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">#</th>
-                                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">Donor</th>
-                                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">Contact</th>
-                                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">Amount</th>
-                                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">Status</th>
-                                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">IDs</th>
-                                    <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold">Date</th>
+                        <table className="w-full text-left border-separate border-spacing-0">
+                            <thead className="bg-slate-50/50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                                <tr className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-widest">
+                                    <th className="px-8 py-5">Donor Profile</th>
+                                    <th className="px-8 py-5">Amount</th>
+                                    <th className="px-8 py-5">Status</th>
+                                    <th className="px-8 py-5">Reference</th>
+                                    <th className="px-8 py-5 text-right">Timestamp</th>
                                 </tr>
                             </thead>
-
-                            <tbody className="text-gray-800">
-                                {donations.map((donation, index) => (
-                                    <tr
-                                        key={donation._id}
-                                        className="border-b border-gray-100 hover:bg-gradient-to-r hover:from-rose-50 hover:to-pink-50 transition-colors"
-                                    >
-                                        <td className="px-4 md:px-6 py-3 md:py-4">
-                                            <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 bg-gray-100 rounded-lg text-xs md:text-sm font-semibold text-gray-600">
-                                                {index + 1}
-                                            </span>
-                                        </td>
-
-                                        <td className="px-4 md:px-6 py-3 md:py-4">
-                                            <div className="flex items-center gap-2 md:gap-3">
-                                                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                                    {donation.name?.charAt(0).toUpperCase() || "?"}
+                            <tbody className="divide-y divide-slate-50 dark:divide-white/5">
+                                {donations.map((donation) => (
+                                    <tr key={donation._id} className="group hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all duration-200">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                                                    {donation.name?.charAt(0).toUpperCase()}
                                                 </div>
-                                                <span className="font-semibold text-gray-800 text-sm md:text-base">
-                                                    {donation.name}
-                                                </span>
+                                                <div className="flex flex-col">
+                                                    <span className="text-slate-800 dark:text-slate-200 font-bold text-sm leading-tight">{donation.name}</span>
+                                                    <span className="text-slate-400 dark:text-slate-500 text-[11px] flex items-center gap-1.5 mt-0.5">
+                                                        <Mail size={12} className="opacity-70" /> {donation.email}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </td>
-
-                                        <td className="px-4 md:px-6 py-3 md:py-4">
-                                            <div className="text-xs md:text-sm text-gray-600">
-                                                <div className="break-all">{donation.email}</div>
-                                            </div>
-                                        </td>
-
-                                        <td className="px-4 md:px-6 py-3 md:py-4">
-                                            <span className="inline-flex items-center px-2 md:px-3 py-1 bg-green-100 text-green-700 rounded-lg font-bold text-xs md:text-sm">
+                                        
+                                        <td className="px-8 py-5">
+                                            <span className="font-black text-slate-900 dark:text-white text-base">
                                                 ${donation.amount}
                                             </span>
                                         </td>
 
-                                        <td className="px-4 md:px-6 py-3 md:py-4">
-                                            <span
-                                                className={`inline-flex items-center px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm
-                                                ${donation.payment_status === "paid"
-                                                        ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white"
-                                                        : "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"}`}
-                                            >
+                                        <td className="px-8 py-5">
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                                                donation.payment_status === "paid" 
+                                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" 
+                                                : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                            }`}>
                                                 {donation.payment_status}
                                             </span>
                                         </td>
 
-                                        {/* 🔥 Tracking ID REMOVED — ONLY Transaction ID KEPT */}
-                                        <td className="px-4 md:px-6 py-3 md:py-4">
-                                            <div className="space-y-1">
-                                                <div className="text-xs text-gray-500">Transaction:</div>
-                                                <code className="block px-2 py-1 bg-gray-100 rounded text-xs font-mono text-gray-600 break-all">
-                                                    {donation.transactionId}
-                                                </code>
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-2 font-mono text-[10px] text-slate-500 dark:text-slate-500 bg-slate-50 dark:bg-white/5 px-2.5 py-1.5 rounded-lg w-fit border border-slate-100 dark:border-white/5">
+                                                <Hash size={10} /> {donation.transactionId}
                                             </div>
                                         </td>
 
-                                        <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">
-                                            <div className="whitespace-nowrap">
-                                                {new Date(donation.created_at).toLocaleString('en-US', {
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    year: 'numeric',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })}
+                                        <td className="px-8 py-5 text-right">
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className="text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5">
+                                                    {new Date(donation.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                    <ArrowUpRight size={12} className="text-rose-500/50" />
+                                                </span>
+                                                <span className="text-slate-400 dark:text-slate-600 text-[10px] font-black uppercase flex items-center gap-1">
+                                                    <Clock size={10} />
+                                                    {/* FIXED: 12-Hour Format (AM/PM) */}
+                                                    {new Date(donation.created_at).toLocaleTimeString('en-US', { 
+                                                        hour: '2-digit', 
+                                                        minute: '2-digit', 
+                                                        hour12: true 
+                                                    })}
+                                                </span>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-
-                        {donations.length === 0 && (
-                            <div className="text-center py-16">
-                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <span className="text-4xl">📭</span>
-                                </div>
-                                <p className="text-gray-500 font-medium text-lg">No donations yet</p>
-                                <p className="text-gray-400 text-sm mt-2">
-                                    Donations will appear here once received
-                                </p>
-                            </div>
-                        )}
                     </div>
+
+                    {donations.length === 0 && (
+                        <div className="py-24 flex flex-col items-center justify-center text-center">
+                            <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-full mb-4">
+                                <Inbox className="w-10 h-10 text-slate-300 dark:text-slate-700" />
+                            </div>
+                            <h4 className="text-slate-800 dark:text-slate-200 font-bold">No Transactions Found</h4>
+                            <p className="text-slate-400 text-xs uppercase tracking-widest mt-1">Archive is empty</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

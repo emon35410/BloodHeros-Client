@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Droplet, MapPin, Mail, User } from 'lucide-react';
+import { Search, MapPin, Mail } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import districtsData from "../../../public/districts.json"
+import districtsData from "../../../public/districts.json";
 import upazilasData from '../../../public/upazilas.json';
 import useAxiousSecure from '../../Hooks/useAxiousSecure';
 import 'aos/dist/aos.css';
@@ -18,255 +18,143 @@ const SearchDonor = () => {
 
     const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-    // Filter upazilas based on selected district
+    useEffect(() => {
+        Aos.init({ duration: 800, once: true });
+    }, []);
+
     const filteredUpazilas = useMemo(() => {
         if (!searchParams.district) return [];
         const selectedDistrict = districtsData.find(d => d.name === searchParams.district);
-        if (!selectedDistrict) return [];
-        return upazilasData.filter(u => u.district_id === selectedDistrict.id);
+        return selectedDistrict ? upazilasData.filter(u => u.district_id === selectedDistrict.id) : [];
     }, [searchParams.district]);
 
-    // Fetch donors using TanStack Query
-    const { data: donors = [], isLoading, isError, refetch } = useQuery({
+    const { data: donors = [], isLoading, refetch } = useQuery({
         queryKey: ['searchDonors', searchParams],
         queryFn: async () => {
-            const params = new URLSearchParams();
-
-            if (searchParams.blood_group) params.append('blood_group', searchParams.blood_group);
-            if (searchParams.district) params.append('district', searchParams.district);
-            if (searchParams.upazila) params.append('upazila', searchParams.upazila);
-
+            const params = new URLSearchParams(Object.fromEntries(Object.entries(searchParams).filter(([_, v]) => v)));
             const response = await axiosSecure.get(`/donors?${params.toString()}`);
             return response.data;
         },
-        enabled: false, // Don't fetch automatically
+        enabled: false,
     });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setSearchParams(prev => {
-            const updated = { ...prev, [name]: value };
-            // Reset upazila when district changes
-            if (name === 'district') {
-                updated.upazila = '';
-            }
-            return updated;
-        });
+        setSearchParams(prev => ({
+            ...prev,
+            [name]: value,
+            ...(name === 'district' ? { upazila: '' } : {})
+        }));
     };
 
     const handleSearch = () => {
         setShouldSearch(true);
-        refetch(); // Manually trigger the query
+        refetch();
     };
-    useEffect(() => {
-        Aos.init({ duration: 1000, once: true });
-    }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 py-12 px-4">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F1A] py-12 px-4 transition-colors duration-300">
             <div className="max-w-6xl mx-auto">
+                
                 {/* Header */}
-                <div data-aos="fade-up" className="text-center mb-10">
-                    <h1 className="text-4xl font-bold text-red-600 mb-2">Find Blood Donors</h1>
-                    <p className="text-gray-600">Search for donors by blood group and location</p>
+                <div data-aos="fade-down" className="text-center mb-10">
+                    <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">
+                        Find <span className="text-red-500">Blood</span> Heroes
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 font-medium">Search for life-savers in your community</p>
                 </div>
 
-                {/* Search Form */}
-                <div data-aos="fade-right" className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-
-                        {/* Blood Group */}
-                        <div>
-                            <label className="block text-sm font-bold text-gray-800 mb-3">
-                                <Droplet className="inline w-5 h-5 mr-2 text-red-500" />
-                                Blood Group
-                            </label>
-
-                            <select
-                                name="blood_group"
-                                value={searchParams.blood_group}
-                                onChange={handleInputChange}
-                                className={`w-full px-4 py-3.5 text-base font-medium border-2 rounded-lg
-        focus:border-red-500 focus:ring-2 focus:ring-red-200 focus:outline-none transition bg-white
-        ${searchParams.blood_group ? 'text-gray-900' : 'text-gray-400'}
-      `}
-                            >
-                                <option value="" disabled hidden>
-                                    Select Blood Group
-                                </option>
-                                {bloodGroups.map(group => (
-                                    <option key={group} value={group} className="text-gray-900">
-                                        {group}
-                                    </option>
-                                ))}
+                {/* Refined Search Box */}
+                <div data-aos="fade-up" className="bg-white dark:bg-[#161B28] border border-slate-200/60 dark:border-slate-800/60 rounded-3xl shadow-xl shadow-slate-200/40 dark:shadow-none p-6 mb-12">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">Blood Group</label>
+                            <select name="blood_group" value={searchParams.blood_group} onChange={handleInputChange} className="w-full h-11 px-4 bg-slate-50 dark:bg-[#1E2533] border-none rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-red-500/20 outline-none">
+                                <option value="">Select Group</option>
+                                {bloodGroups.map(g => <option key={g} value={g}>{g}</option>)}
                             </select>
                         </div>
 
-                        {/* District */}
-                        <div>
-                            <label className="block text-sm font-bold text-gray-800 mb-3">
-                                <MapPin className="inline w-5 h-5 mr-2 text-red-500" />
-                                District
-                            </label>
-
-                            <select
-                                name="district"
-                                value={searchParams.district}
-                                onChange={handleInputChange}
-                                className={`w-full px-4 py-3.5 text-base font-medium border-2 rounded-lg
-        focus:border-red-500 focus:ring-2 focus:ring-red-200 focus:outline-none transition bg-white
-        ${searchParams.district ? 'text-gray-900' : 'text-gray-400'}
-      `}
-                            >
-                                <option value="" disabled hidden>
-                                    Select District
-                                </option>
-                                {districtsData.map(district => (
-                                    <option key={district.id} value={district.name} className="text-gray-900">
-                                        {district.name}
-                                    </option>
-                                ))}
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">District</label>
+                            <select name="district" value={searchParams.district} onChange={handleInputChange} className="w-full h-11 px-4 bg-slate-50 dark:bg-[#1E2533] border-none rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-red-500/20 outline-none">
+                                <option value="">Select District</option>
+                                {districtsData.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
                             </select>
                         </div>
 
-                        {/* Upazila */}
-                        <div>
-                            <label className="block text-sm font-bold text-gray-800 mb-3">
-                                <MapPin className="inline w-5 h-5 mr-2 text-red-500" />
-                                Upazila
-                            </label>
-
-                            <select
-                                name="upazila"
-                                value={searchParams.upazila}
-                                onChange={handleInputChange}
-                                disabled={!searchParams.district}
-                                className={`w-full px-4 py-3.5 text-base font-medium border-2 rounded-lg
-        focus:border-red-500 focus:ring-2 focus:ring-red-200 focus:outline-none transition bg-white
-        disabled:bg-gray-100 disabled:cursor-not-allowed disabled:border-gray-200
-        ${searchParams.upazila ? 'text-gray-900' : 'text-gray-400'}
-      `}
-                            >
-                                <option value="" disabled hidden>
-                                    {searchParams.district ? 'Select Upazila' : 'Select District First'}
-                                </option>
-                                {filteredUpazilas.map(upazila => (
-                                    <option key={upazila.id} value={upazila.name} className="text-gray-900">
-                                        {upazila.name}
-                                    </option>
-                                ))}
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider ml-1">Upazila</label>
+                            <select name="upazila" value={searchParams.upazila} onChange={handleInputChange} disabled={!searchParams.district} className="w-full h-11 px-4 bg-slate-50 dark:bg-[#1E2533] border-none rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-red-500/20 disabled:opacity-50 outline-none">
+                                <option value="">Select Upazila</option>
+                                {filteredUpazilas.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
                             </select>
                         </div>
 
+                        <button onClick={handleSearch} disabled={isLoading} className="h-11 bg-red-500 hover:bg-red-600 active:scale-[0.98] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 disabled:bg-slate-300 dark:disabled:bg-slate-800 shadow-lg shadow-red-500/20 dark:shadow-none">
+                            {isLoading ? <span className="loading loading-spinner loading-xs"></span> : <Search size={18} />}
+                            Find Donors
+                        </button>
                     </div>
-
-
-                    {/* Search Button */}
-                    <button
-                        onClick={handleSearch}
-                        disabled={isLoading}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white text-lg font-bold py-4 rounded-lg transition duration-200 flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-                    >
-                        <Search className="w-6 h-6" />
-                        {isLoading ? 'Searching...' : 'Search Donors'}
-                    </button>
                 </div>
 
                 {/* Results Section */}
-                {shouldSearch && (
-                    <div data-aos="fade-down">
-                        {isLoading ? (
-                            <div className="text-center py-12">
-                                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-red-500 border-t-transparent"></div>
-                                <p className="mt-4 text-gray-600 font-medium">Searching for donors...</p>
-                            </div>
-                        ) : isError ? (
-                            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Search className="w-10 h-10 text-red-500" />
-                                </div>
-                                <h3 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Donors</h3>
-                                <p className="text-gray-600">Please try again later</p>
-                            </div>
-                        ) : donors.length > 0 ? (
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                                    Found {donors.length} Donor{donors.length !== 1 ? 's' : ''}
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {donors.map((donor) => (
-                                        <div
-                                            key={donor._id}
-                                            className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300 transform hover:-translate-y-1"
-                                        >
-                                            <div className="bg-gradient-to-r from-red-500 to-pink-500 h-2"></div>
-                                            <div className="p-6">
-                                                <div className="flex items-center gap-4 mb-4">
-                                                    {donor.photoURL ? (
-                                                        <img
-                                                            src={donor.photoURL}
-                                                            alt={donor.name}
-                                                            className="w-16 h-16 rounded-full object-cover border-4 border-red-100"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                                                            <User className="w-8 h-8 text-red-500" />
-                                                        </div>
-                                                    )}
-                                                    <div className="flex-1">
-                                                        <h3 className="font-bold text-lg text-gray-800">{donor.name}</h3>
-                                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${donor.status === 'active'
-                                                            ? 'bg-green-100 text-green-700'
-                                                            : 'bg-gray-100 text-gray-700'
-                                                            }`}>
-                                                            {donor.status}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center gap-2 text-gray-600">
-                                                        <Droplet className="w-4 h-4 text-red-500" />
-                                                        <span className="font-semibold text-red-600">{donor.blood_group}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-gray-600">
-                                                        <MapPin className="w-4 h-4 text-red-500" />
-                                                        <span className="text-sm">{donor.upazila}, {donor.district}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-gray-600">
-                                                        <Mail className="w-4 h-4 text-red-500" />
-                                                        <span className="text-sm">{donor.email}</span>
-                                                    </div>
-                                                </div>
-
-                                                <button className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition duration-200">
-                                                    Contact Donor
-                                                </button>
+                <div className="min-h-[200px]">
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-12">
+                            <div className="w-8 h-8 border-[3px] border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
+                        </div>
+                    ) : donors.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            {donors.map((donor) => (
+                                <div key={donor._id} className="bg-white dark:bg-[#161B28] rounded-2xl p-4 border border-slate-100 dark:border-slate-800/50 shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div className="flex flex-col items-center text-center">
+                                        <div className="relative mb-3">
+                                            {/* Simplified Image Loading: No complex states */}
+                                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 ring-4 ring-slate-50 dark:ring-slate-900 overflow-hidden">
+                                                <img
+                                                    src={donor.image || donor.photoURL || 'https://i.ibb.co/5GzXkwq/user.png'}
+                                                    alt={donor.name}
+                                                    loading="eager" // Forced to load faster
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-md">
+                                                {donor.blood_group}
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Search className="w-10 h-10 text-gray-400" />
-                                </div>
-                                <h3 className="text-xl font-semibold text-gray-800 mb-2">No Donors Found</h3>
-                                <p className="text-gray-600">Try adjusting your search criteria</p>
-                            </div>
-                        )}
-                    </div>
-                )}
 
-                {/* Initial State */}
-                {!shouldSearch && (
-                    <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                        <Droplet className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Start Your Search</h3>
-                        <p className="text-gray-600">Fill in the search criteria above to find blood donors</p>
-                    </div>
-                )}
+                                        <h3 className="font-bold text-slate-800 dark:text-slate-200 truncate w-full px-2">{donor.name}</h3>
+                                        
+                                        <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500 text-[11px] mt-1 mb-4">
+                                            <MapPin size={10} />
+                                            <span>{donor.upazila}, {donor.district}</span>
+                                        </div>
+
+                                        <div className="w-full flex items-center gap-2 bg-slate-50 dark:bg-[#1E2533] p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/50 mb-4 group transition-colors">
+                                            <Mail size={12} className="text-slate-400 group-hover:text-red-500 transition-colors" />
+                                            <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 truncate flex-1 text-left">{donor.email}</span>
+                                        </div>
+
+                                        <div className="w-full pt-3 border-t border-slate-50 dark:border-slate-800/80 flex items-center justify-between px-1">
+                                            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-widest">Status</span>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${donor.status === 'active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-slate-300'}`}></div>
+                                                <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase">{donor.status}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        shouldSearch && (
+                            <div className="text-center py-16 bg-white dark:bg-[#161B28] rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">No blood heroes found in this area.</p>
+                            </div>
+                        )
+                    )}
+                </div>
             </div>
         </div>
     );

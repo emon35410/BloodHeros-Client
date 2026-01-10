@@ -1,20 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router';
 import {
-    Edit,
-    Trash2,
-    Eye,
-    AlertCircle,
-    Clock,
-    MapPin,
-    Calendar,
-    Droplet,
-    User,
-    ChevronLeft,
-    ChevronRight,
-    Filter,
-    Building2,
-    X
+    Edit, Trash2, Eye, AlertCircle, Clock, MapPin, Calendar, 
+    Droplet, User, ChevronLeft, ChevronRight, Filter, Building2, X
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import useAuth from '../../../Hooks/useAuth';
@@ -27,371 +15,227 @@ const MyBloodRequest = () => {
     const axiousSecure = useAxiousSecure();
     const { user } = useAuth();
     const queryClient = useQueryClient();
-    useEffect(() => {
-        Aos.init({ duration: 1000, once: true });
-    }, []);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteRequestId, setDeleteRequestId] = useState(null);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [selectedRequest, setSelectedRequest] = useState(null);
-
+    
+    const [modal, setModal] = useState({ type: null, data: null });
     const [statusFilter, setStatusFilter] = useState('all');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Fetch blood requests
+    useEffect(() => { Aos.init({ duration: 1000, once: true }); }, []);
+
     const { data: My_BloodRequest = [], isLoading } = useQuery({
         queryKey: ['myBloodRequest', user?.email],
-        queryFn: async () => {
-            const res = await axiousSecure.get(`/donorRequest?email=${user.email}`);
-            return res.data;
-        },
+        queryFn: async () => (await axiousSecure.get(`/donorRequest?email=${user.email}`)).data,
         enabled: !!user?.email
     });
 
+    const invalidate = () => queryClient.invalidateQueries({ queryKey: ['myBloodRequest', user?.email] });
+    
     const updateMutation = useMutation({
         mutationFn: async (updatedData) => {
             const { _id, ...data } = updatedData;
-            const res = await axiousSecure.patch(`/donorRequest/${_id}`, data);
-            return res.data;
+            return axiousSecure.patch(`/donorRequest/${_id}`, data);
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['myBloodRequest', user?.email] });
-            toast.success('Request updated successfully!');
-            setShowEditModal(false);
-        },
-        onError: () => toast.error('Failed to update request')
+        onSuccess: () => { invalidate(); toast.success('Updated successfully!'); setModal({ type: null }); },
     });
 
     const deleteMutation = useMutation({
-        mutationFn: async (id) => {
-            const res = await axiousSecure.delete(`/donorRequest/${id}`);
-            return res.data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['myBloodRequest', user?.email] });
-            toast.success('Request deleted successfully!');
-            setShowDeleteModal(false);
-            setDeleteRequestId(null);
-        },
-        onError: () => toast.error('Failed to delete request')
+        mutationFn: (id) => axiousSecure.delete(`/donorRequest/${id}`),
+        onSuccess: () => { invalidate(); toast.success('Request deleted!'); setModal({ type: null }); },
     });
 
-    const handleEditSubmit = (e) => {
-        e.preventDefault();
-        const form = e.target;
-
-        const time = `${form.hour.value}:${form.minute.value} ${form.ampm.value}`;
-
-        const updatedInfo = {
-            _id: selectedRequest._id,
-            recipientName: form.recipientName.value,
-            hospital: form.hospital.value,
-            donationDate: form.donationDate.value,
-            donationTime: time,
-            address: form.address.value,
-        };
-        updateMutation.mutate(updatedInfo);
-    };
-
-    const filteredRequests = useMemo(() => {
-        if (statusFilter === 'all') return My_BloodRequest;
-        return My_BloodRequest.filter(req => req.status === statusFilter);
-    }, [My_BloodRequest, statusFilter]);
+    const filteredRequests = useMemo(() => 
+        statusFilter === 'all' ? My_BloodRequest : My_BloodRequest.filter(req => req.status === statusFilter)
+    , [My_BloodRequest, statusFilter]);
 
     const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
-    const currentRequests = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage;
-        return filteredRequests.slice(start, start + itemsPerPage);
-    }, [filteredRequests, currentPage]);
-
-    const handleFilterChange = (filter) => {
-        setStatusFilter(filter);
-        setCurrentPage(1);
-    };
+    const currentRequests = filteredRequests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const getStatusBadge = (status) => {
-        const badges = {
-            pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pending' },
-            inprogress: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'In Progress' },
-            done: { bg: 'bg-green-100', text: 'text-green-800', label: 'Done' },
-            canceled: { bg: 'bg-red-100', text: 'text-red-800', label: 'Canceled' }
+        const styles = {
+            pending: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+            inprogress: 'bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-900/30 dark:text-sky-400 dark:border-sky-800',
+            done: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
+            canceled: 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800'
         };
-        const badge = badges[status] || badges.pending;
-        return (
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>
-                {badge.label}
-            </span>
-        );
+        return <span className={`px-3 py-1 rounded-full text-xs font-bold border capitalize ${styles[status] || styles.pending}`}>{status}</span>;
     };
 
-    const statusCounts = {
-        all: My_BloodRequest.length,
-        pending: My_BloodRequest.filter(r => r.status === 'pending').length,
-        inprogress: My_BloodRequest.filter(r => r.status === 'inprogress').length,
-        done: My_BloodRequest.filter(r => r.status === 'done').length,
-        canceled: My_BloodRequest.filter(r => r.status === 'canceled').length
-    };
-
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-            </div>
-        );
-    }
+    if (isLoading) return <div className="flex justify-center min-h-screen items-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600"></div></div>;
 
     return (
-        <div className="space-y-6">
-            <div data-aos="fade-right" className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800">My Donation Requests</h1>
-                    <p className="text-gray-600 mt-1">
-                        Showing {filteredRequests.length} {statusFilter !== 'all' ? statusFilter : 'total'} requests
-                    </p>
+        <div className="p-2 space-y-8 text-gray-800 dark:text-slate-200 transition-colors duration-300">
+            {/* Header */}
+            <div data-aos="fade-down" className="relative p-6 rounded-2xl bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-lg overflow-hidden">
+                <div className="relative z-10">
+                    <h1 className="text-3xl font-extrabold flex items-center gap-2">
+                        <Droplet className="fill-current" /> My Donation Requests
+                    </h1>
+                    <p className="opacity-90 mt-1 font-medium italic">Manage your active blood donation requests effortlessly.</p>
                 </div>
+                <Droplet className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 rotate-12" />
             </div>
 
-            <div data-aos="fade-left" className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <Filter className="w-5 h-5 text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">Filter by Status</h3>
+            {/* Filter Section */}
+            <div data-aos="fade-up" className="bg-white dark:bg-slate-800/50 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-slate-700">
+                <div className="flex items-center gap-2 mb-4 text-rose-600 dark:text-rose-400">
+                    <Filter className="w-5 h-5" /> <h3 className="font-bold text-lg">Filter Requests</h3>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                    {Object.keys(statusCounts).map((key) => (
-                        <button
-                            key={key}
-                            onClick={() => handleFilterChange(key)}
-                            className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${statusFilter === key
-                                ? (key === 'all' ? 'bg-red-600 text-white' :
-                                    key === 'pending' ? 'bg-yellow-500 text-white' :
-                                        key === 'inprogress' ? 'bg-blue-500 text-white' :
-                                            key === 'done' ? 'bg-green-500 text-white' : 'bg-red-500 text-white')
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
-                        >
-                            {key === 'inprogress' ? 'In Progress' : key} ({statusCounts[key]})
+                    {['all', 'pending', 'inprogress', 'done', 'canceled'].map(s => (
+                        <button key={s} onClick={() => {setStatusFilter(s); setCurrentPage(1)}} 
+                        className={`px-5 py-2.5 rounded-xl capitalize font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-sm
+                        ${statusFilter === s ? 'bg-rose-600 text-white' : 'bg-gray-100 dark:bg-slate-700 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-gray-600 dark:text-slate-300'}`}>
+                            {s} <span className="ml-1 opacity-60 text-sm">({s === 'all' ? My_BloodRequest.length : My_BloodRequest.filter(r => r.status === s).length})</span>
                         </button>
                     ))}
                 </div>
             </div>
 
-            {currentRequests.length > 0 ? (
-                <div data-aos="fade-down" className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50 border-b">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Recipient</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Hospital & Location</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date & Time</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Blood Group</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+            {/* Table */}
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-100 dark:border-slate-700">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-gray-50 dark:bg-slate-700/50 border-b dark:border-slate-700">
+                            <tr>
+                                {['Recipient', 'Location', 'Schedule', 'Blood Group', 'Status', 'Actions'].map(h => 
+                                    <th key={h} className="px-6 py-5 text-xs font-black text-gray-500 dark:text-slate-400 uppercase tracking-widest">{h}</th>
+                                )}
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y dark:divide-slate-700">
+                            {currentRequests.map(req => (
+                                <tr key={req._id} className="group hover:bg-rose-50/30 dark:hover:bg-rose-900/5 transition-all">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-lg text-rose-600"><User className="w-5 h-5" /></div>
+                                            <span className="font-bold text-gray-900 dark:text-slate-100">{req.recipientName}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="flex items-center text-sm font-semibold dark:text-slate-300"><Building2 className="w-4 h-4 mr-1 text-blue-500" />{req.hospital}</span>
+                                            <span className="flex items-center text-xs text-gray-500 dark:text-slate-400"><MapPin className="w-3 h-3 mr-1" />{req.upazila}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center text-sm font-medium dark:text-slate-300"><Calendar className="w-4 h-4 mr-1 text-orange-500" />{req.donationDate}</div>
+                                            <div className="flex items-center text-xs text-gray-500 dark:text-slate-400"><Clock className="w-4 h-4 mr-1 text-sky-500" />{req.donationTime}</div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <div className="inline-flex items-center justify-center w-10 h-10 bg-rose-50 dark:bg-rose-900/20 rounded-full text-rose-600 font-black border border-rose-200 dark:border-rose-800">
+                                            {req.bloodGroup}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">{getStatusBadge(req.status)}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex gap-2">
+                                            <Link to={`/requests/${req._id}`} className="p-2 text-sky-600 bg-sky-50 dark:bg-sky-900/20 rounded-xl hover:bg-sky-100 transition-colors" title="View"><Eye className="w-5 h-5" /></Link>
+                                            <button onClick={() => setModal({type: 'edit', data: req})} className="p-2 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl hover:bg-emerald-100 transition-colors" title="Edit"><Edit className="w-5 h-5" /></button>
+                                            <button onClick={() => setModal({type: 'delete', data: req._id})} className="p-2 text-rose-600 bg-rose-50 dark:bg-rose-900/20 rounded-xl hover:bg-rose-100 transition-colors" title="Delete"><Trash2 className="w-5 h-5" /></button>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {currentRequests.map((request) => (
-                                    <tr key={request._id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center">
-                                                <User className="w-5 h-5 text-gray-400 mr-2" />
-                                                <span className="font-medium text-gray-800">{request.recipientName}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center text-sm text-gray-800">
-                                                    <Building2 className="w-4 h-4 mr-1 text-gray-500" />
-                                                    <span className="font-medium">{request.hospital}</span>
-                                                </div>
-                                                <div className="flex items-center text-sm text-gray-600">
-                                                    <MapPin className="w-4 h-4 mr-1" />
-                                                    <span>{request.upazila}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="space-y-1 text-sm text-gray-600">
-                                                <div className="flex items-center">
-                                                    <Calendar className="w-4 h-4 mr-1" />
-                                                    <span>{request.donationDate}</span>
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <Clock className="w-4 h-4 mr-1" />
-                                                    <span>{request.donationTime}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                                                <Droplet className="w-4 h-4 mr-1" />
-                                                {request.bloodGroup}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {getStatusBadge(request.status)}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <Link to={`/requests/${request._id}`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
-                                                    <Eye className="w-5 h-5" />
-                                                </Link>
-
-                                                <button onClick={() => { setSelectedRequest(request); setShowEditModal(true); }} className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Edit">
-                                                    <Edit className="w-5 h-5" />
-                                                </button>
-
-                                                <button onClick={() => { setDeleteRequestId(request._id); setShowDeleteModal(true); }} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
-                                                    <Trash2 className="w-5 h-5" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
-                            <div className="text-sm text-gray-600">
-                                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredRequests.length)} of {filteredRequests.length} results
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-400' : 'text-gray-700 hover:bg-gray-200'}`}><ChevronLeft className="w-5 h-5" /></button>
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <button key={i} onClick={() => setCurrentPage(i + 1)} className={`px-4 py-2 rounded-lg font-medium ${currentPage === i + 1 ? 'bg-red-600 text-white' : 'text-gray-700 hover:bg-gray-200'}`}>{i + 1}</button>
-                                ))}
-                                <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)} className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-400' : 'text-gray-700 hover:bg-gray-200'}`}><ChevronRight className="w-5 h-5" /></button>
-                            </div>
-                        </div>
-                    )}
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-            ) : (
-                <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                    <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No Requests Found</h3>
-                    <p className="text-gray-600">{statusFilter !== 'all' ? `You don't have any ${statusFilter} donation requests.` : "You haven't created any donation requests yet."}</p>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex flex-col sm:flex-row justify-between items-center p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border dark:border-slate-700 gap-4">
+                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Page {currentPage} of {totalPages}</p>
+                    <div className="flex gap-2">
+                        <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-rose-500 hover:text-white transition-all disabled:opacity-30"><ChevronLeft/></button>
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button key={i} onClick={() => setCurrentPage(i + 1)} 
+                            className={`w-10 h-10 rounded-xl font-bold transition-all ${currentPage === i+1 ? 'bg-rose-600 text-white shadow-lg' : 'bg-gray-100 dark:bg-slate-700 hover:bg-rose-100 dark:hover:bg-rose-900/20 dark:text-slate-300'}`}>
+                                {i+1}
+                            </button>
+                        ))}
+                        <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-rose-500 hover:text-white transition-all disabled:opacity-30"><ChevronRight/></button>
+                    </div>
                 </div>
             )}
 
-            {/*  EDIT MODAL */}
-            {showEditModal && selectedRequest && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-xl w-full">
-                        <div className="flex justify-between items-center p-6 border-b">
-                            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Edit Donation Request</h3>
-                            <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                <X />
-                            </button>
+            {/* Modal */}
+            {modal.type && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border dark:border-slate-700">
+                        <div className={`p-6 border-b dark:border-slate-800 flex justify-between items-center text-white ${modal.type === 'edit' ? 'bg-emerald-600' : 'bg-rose-600'}`}>
+                            <h3 className="text-xl font-black uppercase tracking-wide flex items-center gap-2">
+                                {modal.type === 'edit' ? <Edit /> : <AlertCircle />} {modal.type === 'edit' ? 'Update Request' : 'Warning'}
+                            </h3>
+                            <button onClick={() => setModal({type: null})} className="hover:rotate-90 transition-transform"><X/></button>
                         </div>
-
-                        <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                <input
-                                    name="recipientName"
-                                    defaultValue={selectedRequest.recipientName}
-                                    className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
-                                    required
-                                />
-
-                                <input
-                                    name="hospital"
-                                    defaultValue={selectedRequest.hospital}
-                                    className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
-                                    required
-                                />
-
-                                <input
-                                    type="date"
-                                    name="donationDate"
-                                    defaultValue={selectedRequest.donationDate}
-                                    className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
-                                    required
-                                />
-
-                                <div className="flex gap-1">
-                                    <select
-                                        name="hour"
-                                        defaultValue={selectedRequest.donationTime?.split(':')[0] || '01'}
-                                        className="w-full p-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
-                                    >
-                                        {[...Array(12)].map((_, i) => {
-                                            const v = String(i + 1).padStart(2, '0');
-                                            return <option key={i} value={v}>{v}</option>;
-                                        })}
-                                    </select>
-
-                                    <select
-                                        name="minute"
-                                        defaultValue={selectedRequest.donationTime?.split(':')[1]?.split(' ')[0] || '00'}
-                                        className="w-full p-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
-                                    >
-                                        {[...Array(60)].map((_, i) => {
-                                            const v = String(i).padStart(2, '0');
-                                            return <option key={i} value={v}>{v}</option>;
-                                        })}
-                                    </select>
-
-                                    <select
-                                        name="ampm"
-                                        defaultValue={selectedRequest.donationTime?.split(' ')[1] || 'AM'}
-                                        className="w-full p-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
-                                    >
-                                        <option value="AM">AM</option>
-                                        <option value="PM">PM</option>
-                                    </select>
+                        
+                        <div className="p-8">
+                            {modal.type === 'delete' ? (
+                                <div className="text-center">
+                                    <div className="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-rose-50 dark:border-rose-900/50 animate-bounce text-rose-600">
+                                        <Trash2 className="w-10 h-10" />
+                                    </div>
+                                    <p className="text-lg font-bold text-gray-800 dark:text-slate-100">Are you sure?</p>
+                                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-8 italic">This action will permanently remove the donation request.</p>
+                                    <div className="flex gap-4">
+                                        <button onClick={() => setModal({type: null})} className="flex-1 py-3 bg-gray-100 dark:bg-slate-800 font-bold rounded-2xl hover:bg-gray-200 dark:text-slate-300 transition-all">No, Keep it</button>
+                                        <button onClick={() => deleteMutation.mutate(modal.data)} className="flex-1 py-3 bg-rose-600 text-white font-bold rounded-2xl shadow-lg hover:bg-rose-700 transition-all">Yes, Delete</button>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <textarea
-                                name="address"
-                                defaultValue={selectedRequest.address}
-                                rows="2"
-                                className="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
-                                required
-                            />
-
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowEditModal(false)}
-                                    className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={updateMutation.isPending}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-                                >
-                                    {updateMutation.isPending ? 'Updating...' : 'Save Changes'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-
-
-            {/* Delete Modal */}
-            {showDeleteModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                        <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-4">
-                            <AlertCircle className="w-6 h-6 text-red-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800 text-center mb-2">Delete Donation Request</h3>
-                        <p className="text-gray-600 text-center mb-6">Are you sure? This action cannot be undone.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg">Cancel</button>
-                            <button onClick={() => deleteMutation.mutate(deleteRequestId)} disabled={deleteMutation.isPending} className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50">
-                                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-                            </button>
+                            ) : (
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    const f = e.target;
+                                    updateMutation.mutate({
+                                        _id: modal.data._id,
+                                        recipientName: f.recipientName.value,
+                                        hospital: f.hospital.value,
+                                        donationDate: f.donationDate.value,
+                                        donationTime: `${f.hour.value}:${f.minute.value} ${f.ampm.value}`,
+                                        address: f.address.value
+                                    });
+                                }} className="space-y-5">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-black uppercase text-gray-400 dark:text-slate-500">Recipient Name</label>
+                                        <input name="recipientName" defaultValue={modal.data.recipientName} className="w-full p-3 border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:ring-2 ring-emerald-500 outline-none transition-all" required />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-black uppercase text-gray-400 dark:text-slate-500">Hospital</label>
+                                        <input name="hospital" defaultValue={modal.data.hospital} className="w-full p-3 border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:ring-2 ring-emerald-500 outline-none transition-all" required />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-black uppercase text-gray-400 dark:text-slate-500">Date</label>
+                                            <input type="date" name="donationDate" defaultValue={modal.data.donationDate} className="w-full p-3 border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl outline-none" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-black uppercase text-gray-400 dark:text-slate-500">Time</label>
+                                            <div className="flex gap-1">
+                                                <select name="hour" defaultValue={modal.data.donationTime?.split(':')[0]} className="w-full p-2 border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl outline-none">
+                                                    {['01','02','03','04','05','06','07','08','09','10','11','12'].map(h => <option key={h} value={h}>{h}</option>)}
+                                                </select>
+                                                {/* Minute Field Added */}
+                                                <select name="minute" defaultValue={modal.data.donationTime?.split(':')[1]?.split(' ')[0] || '00'} className="w-full p-2 border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl outline-none">
+                                                    {['00','05','10','15','20','25','30','35','40','45','50','55'].map(m => <option key={m} value={m}>{m}</option>)}
+                                                </select>
+                                                <select name="ampm" defaultValue={modal.data.donationTime?.split(' ')[1]} className="p-2 border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl outline-none">
+                                                    <option value="AM">AM</option><option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-black uppercase text-gray-400 dark:text-slate-500">Detailed Address</label>
+                                        <textarea name="address" defaultValue={modal.data.address} className="w-full p-3 border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:ring-2 ring-emerald-500 outline-none transition-all" rows="2" />
+                                    </div>
+                                    <button type="submit" disabled={updateMutation.isPending} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-700 shadow-xl transition-all transform hover:-translate-y-1 disabled:opacity-50">
+                                        {updateMutation.isPending ? 'Processing...' : 'SAVE CHANGES'}
+                                    </button>
+                                </form>
+                            )}
                         </div>
                     </div>
                 </div>

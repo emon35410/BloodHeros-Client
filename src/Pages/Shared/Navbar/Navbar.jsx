@@ -34,8 +34,8 @@ const Navbar = () => {
             <li><NavLink to="/searchDonor" className={navLinkStyles}>Search Donors</NavLink></li>
             <li><NavLink to="/donorBloodRequest" className={navLinkStyles}>Donor Requests</NavLink></li>
             <li><NavLink to="/bloodDonationRequest" className={navLinkStyles}>All Blood Requests</NavLink></li>
-            {/* মোবাইল মেনুর জন্য সাপোর্ট লিঙ্ক */}
-            <li className="lg:hidden"><NavLink to="/supportus" className={navLinkStyles}>Support Us</NavLink></li>
+
+            <li><NavLink to="/supportDonation" className={navLinkStyles}>Support Donations</NavLink></li>
         </>
     );
 

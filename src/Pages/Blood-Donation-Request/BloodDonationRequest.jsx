@@ -1,34 +1,30 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router';
 import {
-    Eye,
-    Calendar,
-    Clock,
-    MapPin,
-    Droplet,
-    User,
-    Mail,
-    Building2,
-    AlertCircle,
-    Filter,
-    ChevronLeft,
-    ChevronRight
+    Eye, Calendar, Clock, MapPin, Droplet, User, 
+    Building2, AlertCircle, Filter, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import useAxiousSecure from '../../Hooks/useAxiousSecure';
-import { useEffect } from 'react';
 import Aos from 'aos';
 import 'aos/dist/aos.css';
 
-
 const BloodDonationRequest = () => {
     const axiousSecure = useAxiousSecure();
-
     const [statusFilter, setStatusFilter] = useState('all');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Fetch all blood requests
+    // AOS Initialization
+    useEffect(() => {
+        Aos.init({ 
+            duration: 800, 
+            once: true,
+            offset: 50 
+        });
+    }, []);
+
+    // Data Fetching
     const { data: bloodRequests = [], isLoading } = useQuery({
         queryKey: ['allBloodRequests'],
         queryFn: async () => {
@@ -36,204 +32,138 @@ const BloodDonationRequest = () => {
             return res.data;
         }
     });
-    useEffect(() => {
-        Aos.init({ duration: 1000, once: true });
-    }, []);
 
-    // Filter requests based on status
-    const filteredRequests = useMemo(() => {
-        if (statusFilter === 'all') {
-            return bloodRequests;
-        }
-        return bloodRequests.filter(req => req.status === statusFilter);
-    }, [bloodRequests, statusFilter]);
+    // Filtering & Pagination Logic Combined
+    const { currentRequests, totalPages, statusCounts, filteredLength } = useMemo(() => {
+        const counts = {
+            all: bloodRequests.length,
+            pending: 0, inprogress: 0, done: 0, canceled: 0
+        };
 
-    // Pagination
-    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentRequests = filteredRequests.slice(startIndex, endIndex);
+        const filtered = bloodRequests.filter(req => {
+            if (req.status in counts) counts[req.status]++;
+            return statusFilter === 'all' || req.status === statusFilter;
+        });
 
-    const handleFilterChange = (filter) => {
-        setStatusFilter(filter);
-        setCurrentPage(1);
-    };
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+        const pages = Math.ceil(filtered.length / itemsPerPage);
+        const start = (currentPage - 1) * itemsPerPage;
+        
+        return {
+            currentRequests: filtered.slice(start, start + itemsPerPage),
+            totalPages: pages,
+            statusCounts: counts,
+            filteredLength: filtered.length
+        };
+    }, [bloodRequests, statusFilter, currentPage]);
 
     const getStatusBadge = (status) => {
-        const badges = {
-            pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pending' },
-            inprogress: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'In Progress' },
-            done: { bg: 'bg-green-100', text: 'text-green-800', label: 'Done' },
-            canceled: { bg: 'bg-red-100', text: 'text-red-800', label: 'Canceled' }
+        const themes = {
+            pending: 'bg-amber-100/60 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200/50',
+            inprogress: 'bg-indigo-100/60 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200/50',
+            done: 'bg-emerald-100/60 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200/50',
+            canceled: 'bg-rose-100/60 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200/50'
         };
-        const badge = badges[status] || badges.pending;
         return (
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>
-                {badge.label}
+            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${themes[status] || themes.pending}`}>
+                {status}
             </span>
         );
     };
 
-    // Status count for filter buttons
-    const statusCounts = {
-        all: bloodRequests.length,
-        pending: bloodRequests.filter(r => r.status === 'pending').length,
-        inprogress: bloodRequests.filter(r => r.status === 'inprogress').length,
-        done: bloodRequests.filter(r => r.status === 'done').length,
-        canceled: bloodRequests.filter(r => r.status === 'canceled').length
-    };
-
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-            </div>
-        );
-    }
+    if (isLoading) return (
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+            <div className="w-10 h-10 border-4 border-rose-500/20 border-t-rose-600 rounded-full animate-spin"></div>
+            <p className="text-slate-500 animate-pulse font-medium">Loading requests...</p>
+        </div>
+    );
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div data-aos="fade-up" className='my-3'>
-                <h1 className="text-3xl text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-pink-500 to-purple-600">
-                    All Blood Donation Requests
+        <div className="max-w-6xl mx-auto px-4 py-12 space-y-8 transition-colors duration-500">
+            
+            {/* Header Section - Fix for Visibility on Reload */}
+            <div data-aos="fade-down" className="text-center space-y-4">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+                    Blood <span className="text-rose-600 dark:text-rose-500">Requests</span>
                 </h1>
-                <p className="text-center mt-1 text-gray-700 font-medium">
-                    Showing <span className="text-red-500 font-semibold">{filteredRequests.length}</span>
-                    {statusFilter !== 'all' ? (
-                        <span className="text-blue-500 font-semibold"> {statusFilter}</span>
-                    ) : (
-                        <span className="text-green-500 font-semibold"> total</span>
-                    )} requests
-                </p>
-            </div>
-
-
-            {/* Filter Buttons */}
-            <div data-aos="fade-left" className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <Filter className="w-5 h-5 text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">Filter by Status</h3>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                    <button
-                        onClick={() => handleFilterChange('all')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'all'
-                            ? 'bg-red-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        All ({statusCounts.all})
-                    </button>
-                    <button
-                        onClick={() => handleFilterChange('pending')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'pending'
-                            ? 'bg-yellow-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        Pending ({statusCounts.pending})
-                    </button>
-                    <button
-                        onClick={() => handleFilterChange('inprogress')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'inprogress'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        In Progress ({statusCounts.inprogress})
-                    </button>
-                    <button
-                        onClick={() => handleFilterChange('done')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'done'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        Done ({statusCounts.done})
-                    </button>
-                    <button
-                        onClick={() => handleFilterChange('canceled')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'canceled'
-                            ? 'bg-red-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        Canceled ({statusCounts.canceled})
-                    </button>
+                <div className="flex items-center justify-center gap-3">
+                    <span className="h-[1px] w-12 bg-slate-200 dark:bg-slate-700"></span>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">
+                        Showing <span className="text-slate-900 dark:text-slate-200 font-bold">{filteredLength}</span> cases
+                    </p>
+                    <span className="h-[1px] w-12 bg-slate-200 dark:bg-slate-700"></span>
                 </div>
             </div>
 
-            {/* Requests Table */}
+            {/* Filter Bar */}
+            <div data-aos="fade-up" className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-2 rounded-2xl shadow-sm flex flex-wrap justify-center gap-2">
+                {Object.entries(statusCounts).map(([key, count]) => (
+                    <button
+                        key={key}
+                        onClick={() => { setStatusFilter(key); setCurrentPage(1); }}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                            statusFilter === key 
+                            ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/30 scale-105' 
+                            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                    >
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                        <span className={`ml-2 opacity-60 text-xs`}>{count}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Content Table */}
             {currentRequests.length > 0 ? (
-                <div data-aos="fade-right" className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div data-aos="zoom-in-up" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50 border-b">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Recipient</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Hospital & Location</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date & Time</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Blood Group</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-[0.15em] font-black">
+                                    <th className="px-6 py-5">Recipient</th>
+                                    <th className="px-6 py-5">Location</th>
+                                    <th className="px-6 py-5">Schedule</th>
+                                    <th className="px-6 py-5">Group</th>
+                                    <th className="px-6 py-5">Status</th>
+                                    <th className="px-6 py-5 text-center">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {currentRequests.map((request) => (
-                                    <tr key={request._id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center">
-                                                <User className="w-5 h-5 text-gray-400 mr-2" />
-                                                <span className="font-medium text-gray-800">{request.recipientName}</span>
+                                    <tr key={request._id} className="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                                        <td className="px-6 py-5 font-bold text-slate-800 dark:text-slate-200">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 group-hover:text-rose-500 transition-colors">
+                                                    <User size={18} />
+                                                </div>
+                                                {request.recipientName}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center text-sm text-gray-800">
-                                                    <Building2 className="w-4 h-4 mr-1 text-gray-500" />
-                                                    <span className="font-medium">{request.hospital}</span>
-                                                </div>
-                                                <div className="flex items-center text-sm text-gray-600">
-                                                    <MapPin className="w-4 h-4 mr-1" />
-                                                    <span>{request.upazila}</span>
-                                                </div>
+                                        <td className="px-6 py-5">
+                                            <div className="space-y-1 text-sm font-medium">
+                                                <p className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5 uppercase text-[12px]">
+                                                    <Building2 size={14} className="opacity-50" /> {request.hospital}
+                                                </p>
+                                                <p className="text-slate-500 dark:text-slate-500 text-xs flex items-center gap-1.5">
+                                                    <MapPin size={14} /> {request.upazila}
+                                                </p>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center text-sm text-gray-600">
-                                                    <Calendar className="w-4 h-4 mr-1" />
-                                                    <span>{request.donationDate}</span>
-                                                </div>
-                                                <div className="flex items-center text-sm text-gray-600">
-                                                    <Clock className="w-4 h-4 mr-1" />
-                                                    <span>{request.donationTime}</span>
-                                                </div>
+                                        <td className="px-6 py-5">
+                                            <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 space-y-1.5">
+                                                <p className="flex items-center gap-2"><Calendar size={14} className="text-rose-500" /> {request.donationDate}</p>
+                                                <p className="flex items-center gap-2 opacity-70"><Clock size={14} /> {request.donationTime}</p>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                                                <Droplet className="w-4 h-4 mr-1" />
+                                        <td className="px-6 py-5">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg font-black text-sm border border-rose-100 dark:border-rose-500/20">
+                                                <Droplet size={14} fill="currentColor" />
                                                 {request.bloodGroup}
-                                            </span>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            {getStatusBadge(request.status)}
-                                        </td>
-
-                                        <td className="px-6 py-4">
-                                            <Link
-                                                to={`/requests/${request._id}`}
-                                                className="inline-flex items-center gap-2 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                title="View Details"
-                                            >
-                                                <Eye className="w-5 h-5" />
-                                                <span className="text-sm font-medium">View</span>
+                                        <td className="px-6 py-5">{getStatusBadge(request.status)}</td>
+                                        <td className="px-6 py-5 text-center">
+                                            <Link to={`/requests/${request._id}`} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 transition-all duration-300 inline-block shadow-sm">
+                                                <Eye size={18} />
                                             </Link>
                                         </td>
                                     </tr>
@@ -242,63 +172,46 @@ const BloodDonationRequest = () => {
                         </table>
                     </div>
 
-                    {/* Pagination */}
+                    {/* Pagination Bar */}
                     {totalPages > 1 && (
-                        <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
-                            <div className="text-sm text-gray-600">
-                                Showing {startIndex + 1} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} results
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className={`p-2 rounded-lg transition-colors ${currentPage === 1
-                                        ? 'text-gray-400 cursor-not-allowed'
-                                        : 'text-gray-700 hover:bg-gray-200'
+                        <div className="px-6 py-6 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center gap-3">
+                            <button 
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 transition-all"
+                            >
+                                <ChevronLeft size={18} className="dark:text-slate-300" />
+                            </button>
+                            <div className="flex gap-2">
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                        className={`w-10 h-10 rounded-xl text-xs font-black transition-all duration-300 ${
+                                            currentPage === i + 1 
+                                            ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xl scale-110' 
+                                            : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                         }`}
-                                >
-                                    <ChevronLeft className="w-5 h-5" />
-                                </button>
-
-                                {[...Array(totalPages)].map((_, index) => {
-                                    const page = index + 1;
-                                    return (
-                                        <button
-                                            key={page}
-                                            onClick={() => handlePageChange(page)}
-                                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === page
-                                                ? 'bg-red-600 text-white'
-                                                : 'text-gray-700 hover:bg-gray-200'
-                                                }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    );
-                                })}
-
-                                <button
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className={`p-2 rounded-lg transition-colors ${currentPage === totalPages
-                                        ? 'text-gray-400 cursor-not-allowed'
-                                        : 'text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
                             </div>
+                            <button 
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-30 transition-all"
+                            >
+                                <ChevronRight size={18} className="dark:text-slate-300" />
+                            </button>
                         </div>
                     )}
                 </div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                    <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No Requests Found</h3>
-                    <p className="text-gray-600">
-                        {statusFilter !== 'all'
-                            ? `No ${statusFilter} donation requests found.`
-                            : "No donation requests available yet."}
-                    </p>
+                <div className="py-32 text-center bg-slate-50 dark:bg-slate-900/40 rounded-[40px] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <AlertCircle className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">No requests found</h3>
+                    <p className="text-slate-500 dark:text-slate-500 mt-2">Try changing your filter settings</p>
                 </div>
             )}
         </div>

@@ -1,233 +1,244 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
-import { Heart, Droplet, User, Phone } from 'lucide-react';
-import Swal from 'sweetalert2';
-import useAxiousSecure from '../../Hooks/useAxiousSecure';
-import useAuth from '../../Hooks/useAuth';
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { 
+    Calendar, Clock, MapPin, Building2, User, 
+    MessageSquare, Droplet, Send, Info, AlertCircle 
+} from "lucide-react";
+import Swal from "sweetalert2";
+import Aos from "aos";
+import 'aos/dist/aos.css';
+import useAuth from "../../Hooks/useAuth";
+import useAxiousSecure from "../../Hooks/useAxiousSecure";
 
-const BloodDonate = () => {
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors },
-        reset
-    } = useForm();
-
+const BloodRequest = () => {
     const { user } = useAuth();
-    const axiosSecure = useAxiousSecure();
+    const [districts, setDistricts] = useState([]);
+    const [upazilas, setUpazilas] = useState([]);
+    const [filteredUpazila, setFilteredUpazila] = useState([]);
+    const axiousSecure = useAxiousSecure();
 
-    const birthDateValue = watch('dob');
+    useEffect(() => {
+        Aos.init({ duration: 1000, once: true });
+        const loadData = async () => {
+            try {
+                const [distRes, upaRes] = await Promise.all([
+                    fetch("/districts.json").then(r => r.json()),
+                    fetch("/upazilas.json").then(r => r.json())
+                ]);
+                setDistricts(distRes);
+                setUpazilas(upaRes);
+            } catch (err) {
+                console.error("Failed to load location data", err);
+            }
+        };
+        loadData();
+    }, []);
 
-    const calculateAge = (dateString) => {
-        if (!dateString) return null;
-        const today = new Date();
-        const birthDate = new Date(dateString);
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
+    const { register, handleSubmit, watch, formState: { errors } } = useForm();
+    const selectedDistrict = watch("district");
+
+    useEffect(() => {
+        if (selectedDistrict) {
+            const filtered = upazilas.filter((item) => item.district_id == selectedDistrict);
+            setFilteredUpazila(filtered);
+        } else {
+            setFilteredUpazila([]);
         }
-        return age;
-    };
-
-    const currentAge = calculateAge(birthDateValue);
-
-    const donateMutation = useMutation({
-        mutationFn: async (donateData) => {
-            const res = await axiosSecure.post('/blood-donate', donateData);
-            return res.data;
-        },
-        onSuccess: () => {
-            Swal.fire({
-                title: 'Registration Successful!',
-                text: "You're a hero! We'll contact you soon.",
-                icon: 'success',
-                confirmButtonColor: '#ef4444',
-            });
-            reset();
-        },
-        onError: () => {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Something went wrong. Please try again.',
-                icon: 'error'
-            });
-        }
-    });
+    }, [selectedDistrict, upazilas]);
 
     const onSubmit = (data) => {
-        // 3. MAP THE CALCULATED AGE TO THE PAYLOAD
-        donateMutation.mutate({
-            ...data,
-            age: currentAge, // Send the number, not the date string
-            dob: data.dob,   // Keep the DOB if needed
-            status: 'pending',
-            createdAt: new Date()
+        const finalTime = `${data.hour}:${data.minute} ${data.ampm}`;
+        const finalData = { 
+            ...data, 
+            donationTime: finalTime, 
+            requesterName: user?.displayName, 
+            requesterEmail: user?.email, 
+            status: "pending",
+            createdAt: new Date().toISOString()
+        };
+
+        const isDark = document.documentElement.classList.contains('dark');
+
+        Swal.fire({
+            title: "Post Emergency Request?",
+            text: "Please double check the patient's location and time.",
+            icon: "question",
+            background: isDark ? '#0f172a' : '#ffffff',
+            color: isDark ? '#f1f5f9' : '#1e293b',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: isDark ? '#334155' : '#94a3b8',
+            confirmButtonText: "Confirm & Post",
+            customClass: { popup: 'rounded-3xl border border-slate-200 dark:border-slate-800' }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await axiousSecure.post("/donorRequest", finalData);
+                    Swal.fire({ 
+                        title: "Live Now!", 
+                        icon: "success", 
+                        timer: 2000, 
+                        showConfirmButton: false,
+                        background: isDark ? '#0f172a' : '#ffffff',
+                        color: isDark ? '#f1f5f9' : '#1e293b'
+                    });
+                    setTimeout(() => window.location.reload(), 2100);
+                } catch (error) {
+                    Swal.fire("Error!", "Could not post request.", "error");
+                }
+            }
         });
     };
 
-    const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-
-    const inputStyle = `w-full px-4 py-2 rounded-lg border outline-none transition 
-        bg-white dark:bg-slate-800 
-        border-gray-300 dark:border-slate-700 
-        text-gray-900 dark:text-gray-100 
-        focus:ring-2 focus:ring-red-500 focus:border-transparent`;
-
-    const labelStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2";
+    // Eye Comfort Focus: Soft borders and balanced contrast
+    const inputClasses = "w-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 px-4 py-3.5 rounded-2xl text-slate-800 dark:text-slate-100 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 outline-none transition-all duration-300 placeholder:text-slate-400 dark:placeholder:text-slate-600";
+    const labelClasses = "flex items-center gap-2 text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 mb-2 ml-1 tracking-widest";
 
     return (
-        <div className="min-h-screen py-12 px-4">
-            <div className="max-w-3xl mx-auto">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="flex items-center justify-center mb-4">
-                        <Heart className="w-12 h-12 text-red-500 mr-2 animate-pulse" />
-                        <h1 className="text-4xl font-bold text-red-500">
-                            Blood<span className="text-green-500">Heros</span>
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#020617] py-12 px-4 transition-colors duration-500">
+            <div className="max-w-4xl mx-auto" data-aos="fade-up">
+                
+                {/* Header Section */}
+                <div className="relative p-10 rounded-[2.5rem] bg-gradient-to-br from-rose-600 via-rose-600 to-orange-500 text-white shadow-2xl shadow-rose-500/20 overflow-hidden mb-10">
+                    <div className="relative z-10">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold uppercase tracking-tighter mb-4">
+                            <AlertCircle size={14} /> Emergency Service
+                        </div>
+                        <h1 className="text-4xl font-black flex items-center gap-4">
+                            Request Blood <Droplet className="animate-pulse fill-white" size={32} />
                         </h1>
+                        <p className="opacity-80 mt-3 font-medium text-lg max-w-lg leading-relaxed">
+                            Connecting you with nearby donors instantly. Please provide accurate details.
+                        </p>
                     </div>
-                    <p className="text-lg text-gray-600 dark:text-gray-400">Every drop counts. Donate your blood and save lives.</p>
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                        <Droplet size={200} strokeWidth={1} />
+                    </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8">
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                        {/* Personal Info */}
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-4 flex items-center border-b pb-2">
-                                <User className="w-6 h-6 mr-2 text-red-500" />
-                                Personal Information
-                            </h2>
-
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className={labelStyle}>Full Name 👤</label>
-                                    <input
-                                        type="text"
-                                        defaultValue={user?.displayName}
-                                        {...register('fullName', { required: 'Name is required' })}
-                                        className={`${inputStyle} cursor-not-allowed opacity-75 bg-gray-100 dark:bg-slate-700`}
-                                        readOnly
-                                    />
+                <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-xl border border-slate-100 dark:border-slate-800/60 overflow-hidden">
+                    <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-12 space-y-10">
+                        
+                        {/* Requester Summary */}
+                        <div className="flex flex-wrap items-center gap-6 p-6 bg-rose-50/50 dark:bg-rose-950/10 rounded-3xl border border-rose-100/50 dark:border-rose-900/20">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-rose-500">
+                                    <User size={24}/>
                                 </div>
-
                                 <div>
-                                    <label className={labelStyle}>Date of Birth *</label>
-                                    <input
-                                        type="date"
-                                        {...register('dob', { // Changed field name to 'dob'
-                                            required: 'Date of birth is required',
-                                            validate: value => calculateAge(value) >= 18 || 'You must be at least 18 years old'
-                                        })}
-                                        className={inputStyle}
-                                    />
-                                    {/* Real-time Age Feedback */}
-                                    {currentAge !== null && !errors.dob && (
-                                        <p className="text-sm font-medium text-emerald-600 mt-1">
-                                            Age: {currentAge} years
-                                        </p>
-                                    )}
-                                    {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>}
+                                    <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500">Requester</p>
+                                    <p className="font-bold text-slate-800 dark:text-slate-200">{user?.displayName}</p>
                                 </div>
                             </div>
-                        </section>
-
-                        {/* Contact Info */}
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-4 flex items-center border-b pb-2">
-                                <Phone className="w-6 h-6 mr-2 text-red-500" />
-                                Contact Information
-                            </h2>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className={labelStyle}>Email *</label>
-                                    <input
-                                        type="email"
-                                        defaultValue={user?.email}
-                                        {...register('email', { required: 'Email is required' })}
-                                        className={`${inputStyle} cursor-not-allowed`}
-                                        readOnly
-                                    />
+                            <div className="h-10 w-px bg-slate-200 dark:bg-slate-800 hidden md:block"></div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-blue-500">
+                                    <MessageSquare size={24}/>
                                 </div>
                                 <div>
-                                    <label className={labelStyle}>Phone *</label>
-                                    <input
-                                        {...register('phone', { required: 'Phone is required' })}
-                                        className={inputStyle}
-                                        placeholder="Your Phone Number"
-                                    />
-                                    {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+                                    <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500">Contact Email</p>
+                                    <p className="font-bold text-slate-800 dark:text-slate-200">{user?.email}</p>
                                 </div>
                             </div>
-                            <div className="mt-4">
-                                <label className={labelStyle}>Address *</label>
-                                <textarea
-                                    {...register('address', { required: 'Address is required' })}
-                                    rows="2"
-                                    className={inputStyle}
-                                    placeholder="Your Full address"
-                                />
-                            </div>
-                        </section>
+                        </div>
 
-                        {/* Blood Info */}
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-4 flex items-center border-b pb-2">
-                                <Droplet className="w-6 h-6 mr-2 text-red-500" />
-                                Blood Information
-                            </h2>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className={labelStyle}>Blood Group *</label>
-                                    <select {...register('bloodGroup', { required: true })} className={inputStyle}>
-                                        <option value="">Select</option>
-                                        {bloodGroups.map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                        {/* Form Body */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                            
+                            {/* Input: Recipient */}
+                            <div className="space-y-1">
+                                <label className={labelClasses}>Recipient Name</label>
+                                <div className="relative group">
+                                    <input {...register("recipientName", { required: true })} placeholder="Patient's Full Name" className={inputClasses} />
+                                    <User className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-rose-500 transition-colors" size={18} />
+                                </div>
+                            </div>
+
+                            {/* Input: Blood Group */}
+                            <div className="space-y-1">
+                                <label className={labelClasses}>Required Group</label>
+                                <select {...register("bloodGroup", { required: true })} className={`${inputClasses} appearance-none cursor-pointer`}>
+                                    <option value="">Select Blood Group</option>
+                                    {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                                </select>
+                            </div>
+
+                            {/* Input: District */}
+                            <div className="space-y-1">
+                                <label className={labelClasses}><MapPin size={14} className="text-rose-500"/> District</label>
+                                <select {...register("district", { required: true })} className={`${inputClasses} appearance-none cursor-pointer`}>
+                                    <option value="">Select District</option>
+                                    {districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                                </select>
+                            </div>
+
+                            {/* Input: Upazila */}
+                            <div className="space-y-1">
+                                <label className={labelClasses}><MapPin size={14} className="text-rose-500"/> Upazila</label>
+                                <select {...register("upazila", { required: true })} className={`${inputClasses} appearance-none cursor-pointer`}>
+                                    <option value="">Select Upazila</option>
+                                    {filteredUpazila.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
+                                </select>
+                            </div>
+
+                            {/* Input: Hospital */}
+                            <div className="md:col-span-2 space-y-1">
+                                <label className={labelClasses}><Building2 size={14} className="text-rose-500"/> Hospital & Point of Interest</label>
+                                <input {...register("hospital", { required: true })} placeholder="e.g. Apollo Hospital, Gate 2" className={inputClasses} />
+                            </div>
+
+                            {/* Input: Address */}
+                            <div className="md:col-span-2 space-y-1">
+                                <label className={labelClasses}><Info size={14} className="text-rose-500"/> Full Address</label>
+                                <textarea {...register("address", { required: true })} rows="2" placeholder="e.g. Ward 4, Bed 20, Level 5, Medical Road" className={`${inputClasses} resize-none`}></textarea>
+                            </div>
+
+                            {/* Input: Date */}
+                            <div className="space-y-1">
+                                <label className={labelClasses}><Calendar size={14} className="text-rose-500"/> Donation Date</label>
+                                <input {...register("donationDate", { required: true })} type="date" className={`${inputClasses} cursor-pointer`} />
+                            </div>
+
+                            {/* Input: Time */}
+                            <div className="space-y-1">
+                                <label className={labelClasses}><Clock size={14} className="text-rose-500"/> Preferred Time</label>
+                                <div className="flex gap-3">
+                                    <select {...register("hour")} className={`${inputClasses} text-center`}>
+                                        {[...Array(12)].map((_, i) => <option key={i+1} value={String(i+1).padStart(2, '0')}>{String(i+1).padStart(2, '0')}</option>)}
+                                    </select>
+                                    <select {...register("minute")} className={`${inputClasses} text-center`}>
+                                        {['00','15','30','45'].map(m => <option key={m} value={m}>{m}</option>)}
+                                    </select>
+                                    <select {...register("ampm")} className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 rounded-2xl font-black text-slate-600 dark:text-slate-400">
+                                        <option value="AM">AM</option>
+                                        <option value="PM">PM</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label className={labelStyle}>Weight (kg) *</label>
-                                    <input
-                                        type="number"
-                                        {...register('weight', {
-                                            required: true,
-                                            min: { value: 50, message: 'Minimum weight is 50kg' }
-                                        })}
-                                        className={inputStyle}
-                                        placeholder="Your Weight"
-                                    />
-                                    {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight.message}</p>}
-                                </div>
                             </div>
-                        </section>
 
-                        {/* Health Declaration */}
-                        <section className="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl">
-                            <label className="flex items-start cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    {...register('healthDeclaration', { required: true })}
-                                    className="mr-3 mt-1 accent-red-500"
-                                />
-                                <span className="text-sm">I confirm that I am in good health *</span>
-                            </label>
-                            {errors.healthDeclaration && <p className="text-red-500 text-xs mt-1">You must confirm health status</p>}
-                        </section>
+                            {/* Input: Message */}
+                            <div className="md:col-span-2 space-y-1">
+                                <label className={labelClasses}>Urgency Message</label>
+                                <textarea {...register("message", { required: true })} rows="3" placeholder="Explain the situation (e.g. Emergency surgery at 10 AM)" className={`${inputClasses} resize-none`}></textarea>
+                            </div>
+                        </div>
 
-                        <button
-                            type="submit"
-                            disabled={donateMutation.isPending}
-                            className="w-full bg-red-500 text-white py-4 rounded-lg font-bold hover:bg-red-600 transition disabled:opacity-50"
-                        >
-                            {donateMutation.isPending ? 'Submitting...' : 'Donate Blood'}
-                        </button>
+                        {/* Action Button */}
+                        <div className="pt-6">
+                            <button type="submit" className="group w-full bg-rose-600 hover:bg-rose-700 text-white py-5 rounded-[2rem] font-black text-xl transition-all duration-500 flex items-center justify-center gap-4 active:scale-[0.97] shadow-2xl shadow-rose-600/30 dark:shadow-rose-900/20 uppercase tracking-[0.2em]">
+                                <span>Broadcast Request</span>
+                                <Send size={24} className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-500" />
+                            </button>
+                            <p className="text-center text-slate-400 dark:text-slate-600 text-[10px] mt-6 font-bold uppercase tracking-widest italic">
+                                * Your request will be visible to all registered donors.
+                            </p>
+                        </div>
+
                     </form>
                 </div>
-                <p className="text-center text-gray-500 mt-6 text-sm">Every donation can save up to 3 lives.</p>
             </div>
         </div>
     );
 };
 
-export default BloodDonate;
+export default BloodRequest;

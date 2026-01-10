@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../../Hooks/useAuth";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, MapPin, Hospital, User, MessageSquare, Droplet, Send } from "lucide-react";
 import useAxiousSecure from "../../../Hooks/useAxiousSecure";
 import Swal from "sweetalert2";
 import Aos from "aos";
@@ -13,19 +13,9 @@ const BloodRequest = () => {
     const [upazilas, setUpazilas] = useState([]);
     const [filteredUpazila, setFilteredUpazila] = useState([]);
     const axiousSecure = useAxiousSecure();
-    useEffect(() => {
-        Aos.init({ duration: 1000, once: true });
-    }, []);
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors },
-    } = useForm();
-
-    const selectedDistrict = watch("district");
 
     useEffect(() => {
+        Aos.init({ duration: 800, once: true });
         const load = async () => {
             const d = await fetch("/districts.json").then((r) => r.json());
             const u = await fetch("/upazilas.json").then((r) => r.json());
@@ -35,11 +25,12 @@ const BloodRequest = () => {
         load();
     }, []);
 
+    const { register, handleSubmit, watch, formState: { errors } } = useForm();
+    const selectedDistrict = watch("district");
+
     useEffect(() => {
         if (selectedDistrict) {
-            const filtered = upazilas.filter(
-                (item) => item.district_id == selectedDistrict
-            );
+            const filtered = upazilas.filter((item) => item.district_id == selectedDistrict);
             setFilteredUpazila(filtered);
         } else {
             setFilteredUpazila([]);
@@ -48,293 +39,145 @@ const BloodRequest = () => {
 
     const onSubmit = (data) => {
         const finalTime = `${data.hour}:${data.minute} ${data.ampm}`;
-
-        const finalData = {
-            ...data,
-            donationTime: finalTime, 
-            requesterName: user?.displayName,
-            requesterEmail: user?.email,
-            status: "pending",
-        };
-        console.log(finalData);
+        const finalData = { ...data, donationTime: finalTime, requesterName: user?.displayName, requesterEmail: user?.email, status: "pending" };
 
         Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to submit this blood donation request?",
+            title: "Confirm Request?",
             icon: "warning",
+            background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#fff',
+            color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#000',
             showCancelButton: true,
-            confirmButtonText: "Yes, submit it!",
-            cancelButtonText: "No, cancel",
-            reverseButtons: true
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: "Yes, Post Request",
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    // Post request to server
                     await axiousSecure.post("/donorRequest", finalData);
-
-                    Swal.fire(
-                        "Submitted!",
-                        "Your donation request has been created.",
-                        "success"
-                    );
+                    Swal.fire({ title: "Success!", icon: "success", timer: 1500 });
                     window.location.reload();
                 } catch (error) {
-                    console.log(error)
-                    Swal.fire(
-                        "Error!",
-                        "Something went wrong. Please try again.",
-                        "error"
-                    );
+                    Swal.fire("Error!", "Action failed.", "error");
                 }
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                Swal.fire(
-                    "Cancelled",
-                    "Your request is not submitted.",
-                    "info"
-                );
             }
         });
     };
 
+    const inputClasses = "w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-slate-800 dark:text-slate-100 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all duration-200";
+    const labelClasses = "flex items-center gap-2 text-[13px] font-semibold text-slate-600 dark:text-slate-400 mb-1.5 ml-1";
+    const optionClasses = "bg-white dark:bg-[#1e293b] text-slate-800 dark:text-slate-100";
 
     return (
-        <div data-aos="fade-up" className="max-w-3xl mx-auto bg-white shadow-md p-8 rounded-xl border border-gray-200">
-            <h2 className="text-3xl font-bold text-red-600 mb-8 text-center">
-                Create Blood Donation Request
-            </h2>
+        <div className="max-w-3xl mx-auto py-3 px-4" data-aos="fade-up">
+            <div className="bg-white dark:bg-[#0b1120] rounded-2xl border border-slate-100 dark:border-slate-800/60 shadow-sm p-8 md:p-12 transition-colors duration-300">
+                
+                <div className="mb-10 border-b border-slate-50 dark:border-slate-800/50 pb-8">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                        <span className="p-2 bg-rose-50 dark:bg-rose-500/10 rounded-lg text-rose-500"><Droplet size={24} /></span>
+                        Create Emergency Request
+                    </h2>
+                    <p className="text-slate-500 dark:text-slate-500 mt-2 text-sm">Provide accurate details to find donors quickly.</p>
+                </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                <div className="grid md:grid-cols-2 gap-5">
-
-                    {/* Requester Name */}
-                    <div>
-                        <label className="font-semibold text-gray-700">Requester Name</label>
-                        <input
-                            type="text"
-                            readOnly
-                            value={user?.displayName}
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg bg-gray-100 text-gray-700"
-                        />
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50/50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500"><User size={16}/></div>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{user?.displayName}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-slate-500/10 flex items-center justify-center text-slate-400"><MessageSquare size={16}/></div>
+                            <span className="text-xs text-slate-500 truncate">{user?.email}</span>
+                        </div>
                     </div>
 
-                    {/* Requester Email */}
-                    <div>
-                        <label className="font-semibold text-gray-700">Requester Email</label>
-                        <input
-                            type="email"
-                            readOnly
-                            value={user?.email}
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg bg-gray-100 text-gray-700"
-                        />
-                    </div>
-
-                    {/* Recipient Name */}
-                    <div>
-                        <label className="font-semibold text-gray-700">Recipient Name</label>
-                        <input
-                            {...register("recipientName", { required: "Recipient name required" })}
-                            type="text"
-                            placeholder="Enter recipient name"
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800"
-                        />
-                        {errors.recipientName && (
-                            <p className="text-red-500 text-sm">{errors.recipientName.message}</p>
-                        )}
-                    </div>
-
-                    {/* District */}
-                    <div>
-                        <label className="font-semibold text-gray-700">Recipient District</label>
-                        <select
-                            {...register("district", { required: "District is required" })}
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800 bg-white"
-                        >
-                            <option value="">Select District</option>
-                            {districts.map((d) => (
-                                <option key={d.id} value={d.id}>
-                                    {d.name}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.district && (
-                            <p className="text-red-500 text-sm">{errors.district.message}</p>
-                        )}
-                    </div>
-
-                    {/* Upazila */}
-                    <div>
-                        <label className="font-semibold text-gray-700">Recipient Upazila</label>
-                        <select
-                            {...register("upazila", { required: "Upazila is required" })}
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg bg-white text-gray-800"
-                        >
-                            <option value="">Select Upazila</option>
-                            {filteredUpazila.map((u) => (
-                                <option key={u.id} value={u.name}>
-                                    {u.name}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.upazila && (
-                            <p className="text-red-500 text-sm">{errors.upazila.message}</p>
-                        )}
-                    </div>
-
-                    {/* Hospital */}
-                    <div className="md:col-span-2">
-                        <label className="font-semibold text-gray-700">Hospital Name</label>
-                        <input
-                            {...register("hospital", { required: "Hospital is required" })}
-                            type="text"
-                            placeholder="Dhaka Medical College Hospital"
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800"
-                        />
-                        {errors.hospital && (
-                            <p className="text-red-500 text-sm">{errors.hospital.message}</p>
-                        )}
-                    </div>
-
-                    {/* Address */}
-                    <div className="md:col-span-2">
-                        <label className="font-semibold text-gray-700">Full Address</label>
-                        <input
-                            {...register("address", { required: "Address is required" })}
-                            type="text"
-                            placeholder="Zahir Raihan Rd, Dhaka"
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800"
-                        />
-                        {errors.address && (
-                            <p className="text-red-500 text-sm">{errors.address.message}</p>
-                        )}
-                    </div>
-
-                    {/* Blood Group */}
-                    <div>
-                        <label className="font-semibold text-gray-700">Blood Group</label>
-                        <select
-                            {...register("bloodGroup", { required: "Blood group required" })}
-                            className="w-full border border-gray-300 px-4 py-2 rounded-lg bg-white text-gray-800"
-                        >
-                            <option value="">Select Blood Group</option>
-                            {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
-                                <option key={bg} value={bg}>
-                                    {bg}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.bloodGroup && (
-                            <p className="text-red-500 text-sm">{errors.bloodGroup.message}</p>
-                        )}
-                    </div>
-
-                    {/* Donation Date */}
-
-
-                    {/* Donation Date */}
-                    <div className="relative">
-                        <label className="font-semibold text-gray-700">Donation Date</label>
-
-                        <div className="relative">
-                            <input
-                                {...register("donationDate", { required: "Donation date required" })}
-                                type="date"
-                                min={new Date().toISOString().split("T")[0]}
-                                name="donationDate"
-                                className="
-                w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800 pr-10 cursor-pointer 
-                appearance-none        /* remove default icon */
-                [&::-webkit-calendar-picker-indicator]:hidden /* remove Chrome default icon */
-            "
-                            />
-
-                            <Calendar
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 cursor-pointer"
-                                size={20}
-                                onClick={() => {
-                                    document.querySelector('input[name="donationDate"]').showPicker();
-                                }}
-                            />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <div className="md:col-span-1">
+                            <label className={labelClasses}>Recipient Name</label>
+                            <input {...register("recipientName", { required: true })} placeholder="Full Name" className={inputClasses} />
                         </div>
 
-                        {errors.donationDate && (
-                            <p className="text-red-500 text-sm">{errors.donationDate.message}</p>
-                        )}
-                    </div>
-
-
-                    {/* Donation Time */}
-                    <div>
-                        <label className="font-semibold text-gray-700">Donation Time</label>
-
-                        <div className="grid grid-cols-3 gap-2 mt-1">
-                            <select
-                                {...register("hour", { required: "Hour required" })}
-                                className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
-                            >
-                                <option value="">Hour</option>
-                                {[...Array(12)].map((_, i) => (
-                                    <option key={i + 1} value={i + 1}>
-                                        {i + 1}
-                                    </option>
+                        <div>
+                            <label className={labelClasses}>Blood Group</label>
+                            <select {...register("bloodGroup", { required: true })} className={inputClasses}>
+                                <option className={optionClasses} value="">Select Group</option>
+                                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
+                                    <option className={optionClasses} key={bg} value={bg}>{bg}</option>
                                 ))}
-                            </select>
-                            <select
-                                {...register("minute", { required: "Minute required" })}
-                                className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
-                            >
-                                <option value="">Min</option>
-                                {[...Array(60)].map((_, i) => (
-                                    <option key={i} value={i < 10 ? `0${i}` : i}>
-                                        {i < 10 ? `0${i}` : i}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <select
-                                {...register("ampm", { required: "AM/PM required" })}
-                                className="border border-gray-300 px-3 py-2 rounded-lg text-gray-800"
-                            >
-                                <option value="">AM/PM</option>
-                                <option value="AM">AM</option>
-                                <option value="PM">PM</option>
                             </select>
                         </div>
 
-                        {/* Error Messages */}
-                        {errors.hour && <p className="text-red-500 text-sm">{errors.hour.message}</p>}
-                        {errors.minute && <p className="text-red-500 text-sm">{errors.minute.message}</p>}
-                        {errors.ampm && <p className="text-red-500 text-sm">{errors.ampm.message}</p>}
+                        <div>
+                            <label className={labelClasses}><MapPin size={14}/> District</label>
+                            <select {...register("district", { required: true })} className={inputClasses}>
+                                <option className={optionClasses} value="">Select District</option>
+                                {districts.map(d => (
+                                    <option className={optionClasses} key={d.id} value={d.id}>{d.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className={labelClasses}><MapPin size={14}/> Upazila</label>
+                            <select {...register("upazila", { required: true })} className={inputClasses}>
+                                <option className={optionClasses} value="">Select Upazila</option>
+                                {filteredUpazila.map(u => (
+                                    <option className={optionClasses} key={u.id} value={u.name}>{u.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="md:col-span-2 space-y-3">
+                            <label className={labelClasses}><Hospital size={14}/> Hospital & Address</label>
+                            <input {...register("hospital", { required: true })} placeholder="Hospital Name" className={inputClasses} />
+                            <input {...register("address", { required: true })} placeholder="Full Address (e.g. Ward 4, Room 202)" className={inputClasses} />
+                        </div>
+
+                        <div>
+                            <label className={labelClasses}><Calendar size={14}/> Date</label>
+                            <input {...register("donationDate", { required: true })} type="date" className={`${inputClasses} dark:color-scheme-dark`} />
+                        </div>
+
+                        <div>
+                            <label className={labelClasses}><Clock size={14}/> Time</label>
+                            <div className="flex gap-2">
+                                {/* Hour */}
+                                <select {...register("hour")} className={inputClasses}>
+                                    {[...Array(12)].map((_, i) => (
+                                        <option className={optionClasses} key={i+1} value={i+1}>{i+1}</option>
+                                    ))}
+                                </select>
+                                
+                                {/* Minute: 0 to 59 */}
+                                <select {...register("minute")} className={inputClasses}>
+                                    {[...Array(60)].map((_, i) => (
+                                        <option className={optionClasses} key={i} value={i < 10 ? `0${i}` : i}>
+                                            {i < 10 ? `0${i}` : i}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {/* AM/PM */}
+                                <select {...register("ampm")} className={inputClasses}>
+                                    <option className={optionClasses} value="AM">AM</option>
+                                    <option className={optionClasses} value="PM">PM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <label className={labelClasses}>Message</label>
+                            <textarea {...register("message", { required: true })} rows="3" placeholder="Why is this urgent?" className={`${inputClasses} resize-none`}></textarea>
+                        </div>
                     </div>
 
+                    <button type="submit" className="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-rose-500/10">
+                        Submit Request <Send size={18} />
+                    </button>
 
-
-
-
-                </div>
-
-                {/* Message */}
-                <div>
-                    <label className="font-semibold text-gray-700">Request Message</label>
-                    <textarea
-                        {...register("message", { required: "Message is required" })}
-                        rows="4"
-                        placeholder="Explain why you need blood..."
-                        className="w-full border border-gray-300 px-4 py-2 rounded-lg text-gray-800"
-                    ></textarea>
-                    {errors.message && (
-                        <p className="text-red-500 text-sm">{errors.message.message}</p>
-                    )}
-                </div>
-
-                {/* Submit */}
-                <button
-                    type="submit"
-                    className="w-full bg-red-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-red-700 transition"
-                >
-                    Submit Donation Request
-                </button>
-
-            </form>
+                </form>
+            </div>
         </div>
     );
 };
