@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const PrivacyPolicy = () => {
+    useEffect(() => {
+        AOS.init({
+            duration: 1000,
+            once: true,
+        });
+    }, []);
+
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0C0F16] transition-colors duration-500 pb-24">
+        <div className="min-h-screen bg-white dark:bg-[#0C0F16] transition-colors duration-500 pb-24 overflow-hidden">
             <div className="max-w-3xl mx-auto px-6 pt-10">
-                {/* Simple Header */}
-                <header className="mb-16 border-b border-slate-100 dark:border-slate-800 pb-10">
+                <header className="mb-16 border-b border-slate-100 dark:border-slate-800 pb-10" data-aos="fade-down">
                     <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
                         Privacy <span className="text-rose-600">Policy</span>
                     </h1>
@@ -14,10 +22,8 @@ const PrivacyPolicy = () => {
                     </p>
                 </header>
 
-                {/* Content Sections */}
                 <div className="space-y-12">
-                    {/* Section 1 */}
-                    <section>
+                    <section data-aos="fade-up">
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-4 flex items-center gap-3">
                             <span className="w-2 h-2 rounded-full bg-rose-600"></span>
                             Information Collection
@@ -35,8 +41,7 @@ const PrivacyPolicy = () => {
                         </div>
                     </section>
 
-                    {/* Section 2 */}
-                    <section>
+                    <section data-aos="fade-up" data-aos-delay="100">
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-4 flex items-center gap-3">
                             <span className="w-2 h-2 rounded-full bg-rose-600"></span>
                             How We Use Data
@@ -49,8 +54,7 @@ const PrivacyPolicy = () => {
                         </div>
                     </section>
 
-                    {/* Section 3 */}
-                    <section>
+                    <section data-aos="fade-up" data-aos-delay="200">
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-4 flex items-center gap-3">
                             <span className="w-2 h-2 rounded-full bg-rose-600"></span>
                             Data Security
@@ -60,8 +64,7 @@ const PrivacyPolicy = () => {
                         </p>
                     </section>
 
-                    {/* Section 4 */}
-                    <section>
+                    <section data-aos="fade-up" data-aos-delay="300">
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-4 flex items-center gap-3">
                             <span className="w-2 h-2 rounded-full bg-rose-600"></span>
                             Your Rights
@@ -72,8 +75,7 @@ const PrivacyPolicy = () => {
                     </section>
                 </div>
 
-                {/* Simple Contact Footer */}
-                <footer className="mt-20 pt-10 border-t border-slate-100 dark:border-slate-800 text-center">
+                <footer className="mt-20 pt-10 border-t border-slate-100 dark:border-slate-800 text-center" data-aos="zoom-in">
                     <p className="text-sm text-slate-500 dark:text-slate-500">
                         Have questions? Email us at <span className="text-rose-600 font-bold">privacy@bloodheroes.org</span>
                     </p>
