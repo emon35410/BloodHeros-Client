@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "icon": "📞",
+        "title": "Emergency Hotline",
+        "info": "+1 (555) 911-BLOOD",
+        "subInfo": "Available 24/7",
+        "color": "from-rose-500/80 to-red-600/80"
+    },
+    {
+        "id": 2,
+        "icon": "☎️",
+        "title": "General Inquiries",
+        "info": "+1 (555) 123-4567",
+        "subInfo": "Mon-Fri, 9AM-6PM",
+        "color": "from-blue-500/80 to-cyan-600/80"
+    },
+    {
+        "id": 3,
+        "icon": "✉️",
+        "title": "Email Support",
+        "info": "info@bloodheroes.org",
+        "subInfo": "Response in 24hrs",
+        "color": "from-purple-500/80 to-fuchsia-600/80"
+    },
+    {
+        "id": 4,
+        "icon": "📍",
+        "title": "Main Office",
+        "info": "123 Hero Lane, City",
+        "subInfo": "State, ZIP 12345",
+        "color": "from-emerald-500/80 to-teal-600/80"
+    }
+]

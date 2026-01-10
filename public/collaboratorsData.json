@@ -1,0 +1,74 @@
+{
+    "stats": [
+        { "id": 1, "number": "50+", "label": "Partners", "icon": "🤝" },
+        { "id": 2, "number": "200+", "label": "Hospitals", "icon": "🏥" },
+        { "id": 3, "number": "100+", "label": "Blood Banks", "icon": "🩸" },
+        { "id": 4, "number": "30+", "label": "NGOs", "icon": "❤️" }
+    ],
+    "partners": [
+        {
+            "id": 1,
+            "name": "City General Hospital",
+            "type": "Medical Partner",
+            "icon": "🏥",
+            "color": "from-blue-500/80 to-cyan-600/80",
+            "desc": "Leading healthcare with pro facilities."
+        },
+        {
+            "id": 2,
+            "name": "Red Cross Society",
+            "type": "NGO Partner",
+            "icon": "➕",
+            "color": "from-red-500/80 to-pink-600/80",
+            "desc": "Global humanitarian blood initiatives."
+        },
+        {
+            "id": 3,
+            "name": "LifeCare Foundation",
+            "type": "Healthcare NGO",
+            "icon": "❤️",
+            "color": "from-pink-500/80 to-rose-600/80",
+            "desc": "Accessible healthcare for all communities."
+        },
+        {
+            "id": 4,
+            "name": "Metro Blood Bank",
+            "type": "Blood Bank",
+            "icon": "🩸",
+            "color": "from-purple-500/80 to-pink-600/80",
+            "desc": "Certified 24/7 emergency blood supply."
+        },
+        {
+            "id": 5,
+            "name": "Health Ministry",
+            "type": "Government",
+            "icon": "🏛️",
+            "color": "from-emerald-500/80 to-teal-600/80",
+            "desc": "Supporting national health awareness campaigns."
+        },
+        {
+            "id": 6,
+            "name": "Community Care",
+            "type": "Social Partner",
+            "icon": "🤝",
+            "color": "from-orange-500/80 to-amber-600/80",
+            "desc": "Organizing local drives and health programs."
+        },
+        {
+            "id": 7,
+            "name": "Global Medics",
+            "type": "Research Partner",
+            "icon": "🔬",
+            "color": "from-indigo-500/80 to-blue-600/80",
+            "desc": "Advanced research in hematology and safety."
+        },
+        {
+            "id": 8,
+            "name": "Unity Aid",
+            "type": "Relief Partner",
+            "icon": "🛡️",
+            "color": "from-slate-500/80 to-slate-700/80",
+            "desc": "Rapid response during natural disasters."
+        }
+    ]
+}
