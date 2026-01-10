@@ -1,197 +1,134 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router';
 import logo from "../../../assets/bloodheros_logo.png"
 import useAuth from '../../../Hooks/useAuth';
-import { LayoutDashboard, LogOut, UserPen } from 'lucide-react';
+import { LayoutDashboard, LogOut, UserPen, Heart, Menu, Sun, Moon } from 'lucide-react';
 
 const Navbar = () => {
-    const links = <>
-        <li>
-            <NavLink
-                to="/"
-                className={({ isActive }) =>
-                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
-                }
-            >
-                Home
-            </NavLink>
-        </li>
-        <li>
-            <NavLink
-                to="/searchDonor"
-                className={({ isActive }) =>
-                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
-                }
-            >
-                Search Donors
-            </NavLink>
-        </li>
-        <li>
-            <NavLink
-                to="/donorBloodRequest"
-                className={({ isActive }) =>
-                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
-                }
-            >
-                 Donor Requests
-            </NavLink>
-        </li>
-        <li>
-            <NavLink
-                to="/bloodDonationRequest"
-                className={({ isActive }) =>
-                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
-                }
-            >
-               All Blood Donation Requests
-            </NavLink>
-        </li>
-        <li>
-            <NavLink
-                to="/supportDonation"
-                className={({ isActive }) =>
-                    `font-medium transition-all duration-300 ${isActive ? 'text-red-500 bg-red-50' : 'hover:text-red-500 hover:bg-red-50'}`
-                }
-            >
-               All Support Donation 
-            </NavLink>
-        </li>
-    </>;
     const { user, logOut } = useAuth();
+    const [isDark, setIsDark] = useState(localStorage.getItem('theme') === 'dark');
+
+    useEffect(() => {
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [isDark]);
+
     const handleLogout = () => {
-        logOut()
-            .then()
-            .catch(error => {
-                console.log(error)
-            })
+        logOut().catch(error => console.error(error));
     }
 
+    const navLinkStyles = ({ isActive }) =>
+        `px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+            isActive 
+            ? 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400' 
+            : 'text-gray-700 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+        }`;
+
+    const links = (
+        <>
+            <li><NavLink to="/" className={navLinkStyles}>Home</NavLink></li>
+            <li><NavLink to="/searchDonor" className={navLinkStyles}>Search Donors</NavLink></li>
+            <li><NavLink to="/donorBloodRequest" className={navLinkStyles}>Donor Requests</NavLink></li>
+            <li><NavLink to="/bloodDonationRequest" className={navLinkStyles}>All Requests</NavLink></li>
+            <li><NavLink to="/supportDonation" className={navLinkStyles}>Support</NavLink></li>
+        </>
+    );
+
     return (
-        <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-600 shadow-lg">
-            <div className="navbar max-w-7xl mx-auto text-white">
+        <div className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
+            <div className="navbar max-w-7xl mx-auto px-4">
+                
+                {/* Navbar Start */}
                 <div className="navbar-start">
                     <div className="dropdown">
-                        <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden text-white hover:bg-white/20">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
-                            </svg>
+                        <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden p-1">
+                            <Menu className="h-6 w-6 text-gray-700 dark:text-gray-200" />
                         </div>
-                        <ul
-                            tabIndex={0}
-                            className="menu menu-sm dropdown-content bg-black rounded-box z-50 mt-3 w-64 p-2 shadow-xl border-2 border-red-200">
+                        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-white dark:bg-gray-800 rounded-2xl z-50 mt-3 w-64 p-4 shadow-2xl border border-gray-100 dark:border-gray-700">
                             {links}
                         </ul>
                     </div>
-                    <Link className="btn btn-ghost  flex items-center gap-1 h-auto py-1">
-
-                        <img
-                            src={logo}
-                            alt="BloodHeroes Logo"
-                            className="h-12 md:h-14 lg:h-16 w-auto object-contain drop-shadow-md"
-                        />
-
-                        <span className="text-xl lg:text-4xl font-bold bg-gradient-to-r from-white to-red-200 bg-clip-text text-red-500  sm:inline">
-                            Blood<span className='text-green-500'>Heroes</span>
+                    
+                    {/* Logo with Hover Gradient Effect */}
+                    <Link to="/" className="group flex items-center gap-2 transition-all duration-500">
+                        <div className="relative">
+                            <img src={logo} alt="Logo" className="h-10 md:h-12 object-contain relative z-10 transition-transform duration-500 group-hover:scale-110" />
+                            
+                            <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        </div>
+                        <span className="text-xl md:text-2xl font-black tracking-tighter transition-all duration-500 group-hover:bg-gradient-to-r group-hover:from-red-600 group-hover:to-rose-400 group-hover:bg-clip-text group-hover:text-transparent">
+                            <span className="text-red-600 group-hover:text-inherit transition-colors">Blood</span>
+                            <span className="text-gray-800 dark:text-gray-100 group-hover:text-inherit transition-colors">Heroes</span>
                         </span>
-
                     </Link>
-
                 </div>
-                <div className="navbar-center hidden lg:flex">
-                    <ul className="menu menu-horizontal px-1 ">
-                        {links}
 
+                {/* Navbar Center */}
+                <div className="navbar-center hidden lg:flex">
+                    <ul className="menu menu-horizontal gap-1 px-1">
+                        {links}
                     </ul>
                 </div>
-                <div className="navbar-end gap-2">
 
-                    {
-                        user ?
-                            <>
-                                <Link to="/supportus" className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
-                                    <span className="text-xl">❤️</span>
-                                    Support Us
-                                </Link>
-                                <div className="dropdown dropdown-end">
-                                    <div
-                                        tabIndex={0}
-                                        role="button"
-                                        className="cursor-pointer flex items-center"
-                                    >
-                                        <img
-                                            className="h-12 w-12 rounded-full border-2 border-red-500 shadow-md hover:scale-105 transition"
-                                            src={user?.photoURL}
-                                            alt="User"
-                                        />
+                {/* Navbar End */}
+                <div className="navbar-end gap-2 md:gap-4">
+                    
+                    {/* Dark Mode Toggle Button */}
+                    <button 
+                        onClick={() => setIsDark(!isDark)}
+                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-yellow-400"
+                        title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    >
+                        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                    </button>
+
+                    {user ? (
+                        <>
+                            <Link to="/supportus" className="hidden sm:flex btn btn-sm h-10 bg-gradient-to-r from-red-600 to-rose-500 text-white border-none hover:shadow-lg hover:shadow-red-500/30 hover:scale-105 transition-all">
+                                <Heart className="w-4 h-4 fill-current" />
+                                Support
+                            </Link>
+
+                            <div className="dropdown dropdown-end">
+                                <div tabIndex={0} role="button" className="avatar hover:ring-2 ring-red-500 ring-offset-2 rounded-full transition-all duration-300">
+                                    <div className="w-10 rounded-full border border-gray-200 dark:border-gray-700">
+                                        <img src={user?.photoURL || 'https://via.placeholder.com/150'} alt="User" />
                                     </div>
-
-                                   
-                                    <ul
-                                        tabIndex={0}
-                                        className="dropdown-content menu bg-white rounded-xl shadow-xl w-60 mt-3 p-3 border border-red-200"
-                                    >
-                                       
-                                        <li>
-                                            <Link
-                                                to="/dashboard"
-                                                className="py-3 px-3 font-semibold rounded-lg bg-red-50 text-red-600 
-               hover:bg-red-600 hover:text-white transition-all duration-300 hover:scale-[1.02]
-               shadow-sm hover:shadow-md"
-                                            >
-                                                <LayoutDashboard /> Dashboard
-                                            </Link>
-                                        </li>
-
-                                        {/* PROFILE */}
-                                        <li className="mt-2">
-                                            <Link
-                                                to="/myprofile"
-                                                className="py-3 px-3 font-semibold rounded-lg bg-red-50 text-red-600 
-               hover:bg-red-600 hover:text-white transition-all duration-300 hover:scale-[1.02]
-               shadow-sm hover:shadow-md"
-                                            >
-                                                <UserPen /> My Profile
-                                            </Link>
-                                        </li>
-
-                                        {/* LOGOUT */}
-                                        <li className="mt-2">
-                                            <button
-                                                onClick={handleLogout}
-                                                className="py-3 px-3 font-semibold rounded-lg bg-red-100 text-red-700 
-               hover:bg-red-700 hover:text-white transition-all duration-300 hover:scale-[1.02]
-               shadow-lg border border-red-300"
-                                            >
-                                                <LogOut /> Logout
-                                            </button>
-                                            <Link to="/supportus" className="btn mt-2 bg-red-600 text-white border-none font-semibold shadow-lg hover:bg-red-700 hover:shadow-red-300/50 transition-all duration-300 hover:scale-110 md:hidden sm:flex items-center gap-2 px-5 py-3 rounded-xl">
-                                                <span className="text-xl animate-pulse">❤️</span>Support Us</Link>
-
-                                        </li>
-                                    </ul>
                                 </div>
-
-
-                            </>
-
-                            :
-                            <>
-                                <Link to="/login" className="btn bg-white text-red-600 hover:bg-red-50 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                    </svg>
-                                    Login
-                                </Link>
-                                <Link to="/supportus" className="btn bg-yellow-400 text-gray-800 hover:bg-yellow-300 border-none font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 hidden sm:flex">
-                                    <span className="text-xl">❤️</span>
-                                    Support Us
-                                </Link>
-                            </>
-
-
-                    }
-
-
+                                <ul tabIndex={0} className="dropdown-content menu bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-64 mt-4 p-3 border border-gray-50 dark:border-gray-700 space-y-1">
+                                    <div className="px-4 py-2 border-b dark:border-gray-700 mb-2">
+                                        <p className="font-bold text-gray-800 dark:text-gray-100 truncate">{user?.displayName}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+                                    </div>
+                                    <li>
+                                        <Link to="/dashboard" className="flex items-center gap-3 p-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-200 rounded-xl">
+                                            <LayoutDashboard className="w-5 h-5 text-red-500" /> Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/myprofile" className="flex items-center gap-3 p-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-200 rounded-xl">
+                                            <UserPen className="w-5 h-5 text-red-500" /> My Profile
+                                        </Link>
+                                    </li>
+                                    <div className="border-t dark:border-gray-700 my-1"></div>
+                                    <li>
+                                        <button onClick={handleLogout} className="flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl">
+                                            <LogOut className="w-5 h-5" /> Logout
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </>
+                    ) : (
+                        <Link to="/login" className="btn btn-sm h-10 px-6 bg-gray-900 dark:bg-red-600 text-white hover:bg-gray-800 dark:hover:bg-red-700 border-none rounded-full shadow-lg transition-all">
+                            Login
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>
