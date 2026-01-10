@@ -1,95 +1,54 @@
 import Aos from 'aos';
 import React, { useEffect } from 'react';
 import 'aos/dist/aos.css';
+import featureData from '../../../../public/features.json';
 
 const FeaturedSection = () => {
-    const features = [
-        {
-            icon: "🩸",
-            title: "Easy Blood Donation",
-            description: "Simple and quick donation process with pre-screening and comfortable facilities. Our trained staff ensures your safety and comfort throughout.",
-            color: "from-red-500 to-pink-500"
-        },
-        {
-            icon: "🔍",
-            title: "Find Donors Instantly",
-            description: "Search our database of verified donors by blood type and location. Connect with compatible donors in your area within minutes.",
-            color: "from-blue-500 to-cyan-500"
-        },
-        {
-            icon: "🚨",
-            title: "Emergency Requests",
-            description: "Post urgent blood requirements and get immediate responses from nearby donors. Life-saving help is just a click away.",
-            color: "from-orange-500 to-red-500"
-        },
-        {
-            icon: "📱",
-            title: "Real-Time Notifications",
-            description: "Get instant alerts when someone needs your blood type. Stay connected and be ready to save lives at any moment.",
-            color: "from-purple-500 to-pink-500"
-        },
-        {
-            icon: "🏥",
-            title: "Verified Blood Banks",
-            description: "Access a network of certified hospitals and blood banks. Check real-time blood availability and schedule appointments online.",
-            color: "from-green-500 to-emerald-500"
-        },
-        {
-            icon: "🎖️",
-            title: "Donor Recognition",
-            description: "Earn badges and certificates for your contributions. Track your donation history and see the lives you've impacted.",
-            color: "from-yellow-500 to-orange-500"
-        }
-    ];
-
     useEffect(() => {
-            Aos.init({ duration: 1000, once: true });
-        }, []);
+        Aos.init({ duration: 800, once: true });
+    }, []);
 
     return (
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div  data-aos="fade-left" className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 rounded-full border border-red-200 mb-4">
-                        <span className="text-2xl">❤️</span>
-                        <span className="text-red-600 font-semibold text-sm">Why Choose BloodHeroes</span>
-                    </div>
-                    <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-                        Making Blood Donation
-                        <span className="block mt-2 bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
-                            Simple & Accessible
-                        </span>
+        <section className="py-16 bg-[#FAFAFA] dark:bg-[#0B0F1A] transition-colors duration-500">
+            <div className="max-w-6xl mx-auto px-6">
+                
+                {/* Section Header */}
+                <div data-aos="fade-up" className="text-center mb-12">
+                    <span className="inline-block px-3 py-1 text-[10px] font-bold tracking-widest text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-md mb-3 uppercase">
+                        Our Services
+                    </span>
+                    <h2 className="text-3xl font-black text-gray-800 dark:text-gray-100 mb-3">
+                        Why Choose <span className="text-red-600">BloodHeroes</span>
                     </h2>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        We connect donors with those in need, creating a lifesaving network that's always there when it matters most.
+                    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-lg mx-auto leading-relaxed">
+                        We prioritize safety and speed to ensure every drop of blood reaches those who need it most.
                     </p>
                 </div>
 
-                {/* Features Grid */}
-                <div data-aos="fade-right" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-                    {features.map((feature, index) => (
+                {/* Compact Grid with Small Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {featureData.map((feature, index) => (
                         <div
-                            key={index}
-                            className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
+                            key={feature.id || index}
+                            data-aos="fade-up"
+                            data-aos-delay={index * 50}
+                            className="group p-5 bg-white dark:bg-[#161B27] rounded-xl border border-gray-100 dark:border-gray-800/50 hover:border-red-500/30 transition-all duration-300 shadow-sm hover:shadow-md"
                         >
-                            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${feature.color} opacity-5 rounded-2xl transform rotate-12 group-hover:rotate-6 transition-transform duration-300`}></div>
-
-                            <div className={`relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${feature.color} rounded-xl mb-6 text-3xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                            {/* Small & Soft Icon Box */}
+                            <div className={`w-10 h-10 mb-4 rounded-lg flex items-center justify-center text-lg bg-gradient-to-br ${feature.color} shadow-sm group-hover:scale-110 transition-transform`}>
                                 {feature.icon}
                             </div>
 
-                            <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors duration-300">
+                            <h3 className="text-base font-bold text-gray-800 dark:text-gray-100 mb-2">
                                 {feature.title}
                             </h3>
-                            <p className="text-gray-600 leading-relaxed">
+                            
+                            <p className="text-xs text-gray-500 dark:text-gray-400 leading-snug">
                                 {feature.description}
                             </p>
                         </div>
                     ))}
                 </div>
-
-              
-               
             </div>
         </section>
     );

@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "icon": "🩸",
+        "title": "Seamless Donation",
+        "description": "Experience a stress-free donation process with our certified medical professionals in a soothing environment.",
+        "color": "from-red-500/70 to-rose-600/70"
+    },
+    {
+        "id": 2,
+        "icon": "🔍",
+        "title": "Smart Donor Locator",
+        "description": "Utilize our advanced geographic filters to find verified blood donors in your immediate vicinity instantly.",
+        "color": "from-blue-500/70 to-indigo-600/70"
+    },
+    {
+        "id": 3,
+        "icon": "🚨",
+        "title": "Urgent Response",
+        "description": "Broadcast critical blood requirements to a massive network and receive real-time assistance during emergencies.",
+        "color": "from-orange-500/70 to-red-600/70"
+    },
+    {
+        "id": 4,
+        "icon": "📱",
+        "title": "Instant Notifications",
+        "description": "Receive personalized alerts directly to your device whenever a matching blood request is posted nearby.",
+        "color": "from-purple-500/70 to-fuchsia-600/70"
+    },
+    {
+        "id": 5,
+        "icon": "🏥",
+        "title": "Inventory Tracking",
+        "description": "Monitor real-time blood stock levels at local certified hospitals and blood banks to plan your requests.",
+        "color": "from-emerald-500/70 to-teal-600/70"
+    },
+    {
+        "id": 6,
+        "icon": "🎖️",
+        "title": "Impact Analytics",
+        "description": "Track your personal contribution journey and visualize the number of lives saved through your donations.",
+        "color": "from-amber-500/70 to-orange-600/70"
+    }
+]
