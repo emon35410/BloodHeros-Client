@@ -11,7 +11,7 @@ const HowItWorks = () => {
     return (
         <div className="min-h-screen bg-white dark:bg-[#0C0F16] transition-colors duration-500 pb-20 overflow-hidden">
             {/* Page Header */}
-            <header className="pt-20 pb-16 px-6 text-center" data-aos="fade-down">
+            <header className="pt-10 pb-16 px-6 text-center" data-aos="fade-left">
                 <div className="max-w-3xl mx-auto">
                     <h2 className="text-rose-600 font-bold tracking-[0.2em] uppercase text-xs mb-4">
                         Step by Step Process

@@ -11,7 +11,7 @@ const SuccessStories = () => {
     const doubleStories = [...successStories, ...successStories];
 
     return (
-        <section className="py-24 bg-white dark:bg-[#0C0F16] transition-colors duration-500 overflow-hidden">
+        <section className="py-14 bg-white dark:bg-[#0C0F16] transition-colors duration-500 overflow-hidden">
             <div className="max-w-6xl mx-auto px-6 mb-16">
                 <div className="text-center max-w-2xl mx-auto" data-aos="fade-up">
                     <h2 className="text-rose-600 font-bold tracking-[0.2em] uppercase text-xs mb-4">Success Stories</h2>

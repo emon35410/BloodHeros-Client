@@ -9,14 +9,20 @@ const StatisticsSection = () => {
     }, []);
 
     return (
-        <section className="py-20 bg-[#FDFDFD] dark:bg-[#0C0F16] transition-colors duration-500 overflow-hidden">
+        <section className="py-10 bg-[#FDFDFD] dark:bg-[#0C0F16] transition-colors duration-500 overflow-hidden">
             <div className="max-w-6xl mx-auto px-6">
-                
+
+                {/* Centered Header */}
                 {/* Centered Header */}
                 <div className="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
-                    <h2 className="text-rose-600 font-bold tracking-[0.2em] uppercase text-xs mb-4">
-                        Statistics & Impact
-                    </h2>
+
+                    {/* Updated Badge to work on both Light & Dark Mode */}
+                    <div className="inline-flex items-center px-4 py-1.5 bg-slate-100 dark:bg-white/10 backdrop-blur-md rounded-full border border-slate-200 dark:border-white/20 mb-6 shadow-sm">
+                        <h2 className="text-rose-600 dark:text-rose-500 font-bold tracking-[0.2em] uppercase text-[10px] sm:text-xs">
+                            Statistics & Impact
+                        </h2>
+                    </div>
+
                     <h3 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight mb-6">
                         The numbers behind every <span className="text-rose-600">heartbeat.</span>
                     </h3>
@@ -29,8 +35,8 @@ const StatisticsSection = () => {
                 {/* Compact Cards Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {statisticsData.map((stat, index) => (
-                        <div 
-                            key={stat.id} 
+                        <div
+                            key={stat.id}
                             data-aos="fade-up"
                             data-aos-delay={index * 100}
                             className="group relative p-6 bg-white dark:bg-[#11151F] rounded-2xl border border-slate-100 dark:border-slate-800/50 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center"

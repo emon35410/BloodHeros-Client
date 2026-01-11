@@ -30,6 +30,7 @@ import DonorDetailsView from "../Components/View/DonorDetailsView";
 import DonorRequestDonation from "../Pages/Donor_Request_donation/DonorRequestDonation";
 import AboutUs from "../Components/AboutUs/AboutUs";
 import PrivacyPolicy from "../Components/PrivacyPolicy/PrivacyPolicy";
+import TermsAndConditions from "../Components/TermsAndConditions/TermsAndConditions";
 
 
 export const router = createBrowserRouter([
@@ -101,6 +102,10 @@ export const router = createBrowserRouter([
       {
         path: "privacy",
         element:<PrivacyPolicy></PrivacyPolicy>
+      },
+      {
+        path: "terms",
+        element:<TermsAndConditions></TermsAndConditions>
       }
     ]
   },

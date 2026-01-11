@@ -35,12 +35,11 @@ const FAQ = () => {
                     </h3>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 "data-aos="fade-up">
                     {faqData.map((item, index) => (
                         <div 
                             key={item.id}
-                            data-aos="fade-up"
-                            data-aos-delay={index * 50}
+                            
                             className={`group border rounded-[2rem] transition-all duration-500 ${
                                 activeIndex === index 
                                 ? 'bg-white dark:bg-[#11151F] border-rose-500/30 shadow-xl' 

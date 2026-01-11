@@ -9,7 +9,7 @@ const Benefits = () => {
     }, []);
 
     return (
-        <section className="py-24 bg-white dark:bg-[#0C0F16] transition-colors duration-500 overflow-hidden">
+        <section className="py-14 bg-white dark:bg-[#0C0F16] transition-colors duration-500 overflow-hidden">
             <div className="max-w-7xl mx-auto px-6">
                 
                 {/* Section Header */}

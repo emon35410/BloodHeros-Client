@@ -4,21 +4,16 @@ import useAxiousSecure from '../../Hooks/useAxiousSecure';
 import {
     ArrowLeft,
     User,
-    Mail,
     MapPin,
     Building2,
     Calendar,
     Clock,
     Droplet,
     MessageSquare,
-    CheckCircle,
-    XCircle,
-    AlertCircle,
-    Home
+    AlertCircle
 } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-
 
 const ViewDetails = () => {
     const { id } = useParams();
@@ -26,15 +21,9 @@ const ViewDetails = () => {
     const axiosSecure = useAxiousSecure();
     const [request, setRequest] = useState(null);
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-in-out',
-            once: true,
-        });
-    }, []);
 
     useEffect(() => {
+        AOS.init({ duration: 600, once: true });
         axiosSecure.get(`/donorRequest/${id}`)
             .then(res => {
                 setRequest(res.data);
@@ -46,251 +35,128 @@ const ViewDetails = () => {
             });
     }, [id, axiosSecure]);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex justify-center items-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+    if (loading) return (
+        <div className="min-h-screen flex justify-center items-center bg-slate-50 dark:bg-slate-950">
+            <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+    );
+
+    if (!request) return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <div className="text-center">
+                <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-3 opacity-50" />
+                <p className="text-slate-500 dark:text-slate-400 font-medium">Request Not Found</p>
+                <button onClick={() => navigate(-1)} className="mt-4 text-rose-500 font-bold">Go Back</button>
             </div>
-        );
-    }
-
-    if (!request) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-lg p-8 text-center max-w-md">
-                    <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Request Not Found</h2>
-                    <p className="text-gray-600 mb-6">The donation request you're looking for doesn't exist.</p>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Go Back
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    const getStatusBadge = (status) => {
-        const badges = {
-            pending: {
-                bg: 'bg-yellow-100',
-                text: 'text-yellow-800',
-                border: 'border-yellow-300',
-                icon: Clock,
-                label: 'Pending'
-            },
-            inprogress: {
-                bg: 'bg-blue-100',
-                text: 'text-blue-800',
-                border: 'border-blue-300',
-                icon: AlertCircle,
-                label: 'In Progress'
-            },
-            done: {
-                bg: 'bg-green-100',
-                text: 'text-green-800',
-                border: 'border-green-300',
-                icon: CheckCircle,
-                label: 'Completed'
-            },
-            canceled: {
-                bg: 'bg-red-100',
-                text: 'text-red-800',
-                border: 'border-red-300',
-                icon: XCircle,
-                label: 'Canceled'
-            }
-        };
-
-        const badge = badges[status] || badges.pending;
-        const Icon = badge.icon;
-
-        return (
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 ${badge.bg} ${badge.text} ${badge.border}`}>
-                <Icon className="w-5 h-5" />
-                <span className="font-semibold">{badge.label}</span>
-            </div>
-        );
-    };
+        </div>
+    );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 py-8">
-            <div className="max-w-5xl mx-auto px-4">
-                {/* Back Button */}
-                <button
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 transition-colors duration-300">
+            <div className="max-w-2xl mx-auto px-6">
+                
+                {/* Back Link */}
+                <button 
                     onClick={() => navigate(-1)}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors mb-6"
+                    className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-rose-500 transition-colors mb-6 group"
                 >
-                    <ArrowLeft className="w-5 h-5" />
-                    <span className="font-medium">Back</span>
+                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                    <span className="text-sm font-bold">Back to Dashboard</span>
                 </button>
 
-                {/* Header Card */}
-                <div data-aos="fade-down" className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                    <div className="bg-gradient-to-r from-red-500 to-pink-600 px-8 py-6 flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-white mb-2">Blood Donation Request</h1>
-                            <p className="text-red-100">Request ID: {request._id}</p>
+                {/* Main Compact Card */}
+                <div data-aos="fade-up" className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                    
+                    {/* Header: Blood Group & Status */}
+                    <div className="p-6 border-b dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+                                <Droplet className="text-white" size={24} fill="currentColor" />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-black text-slate-800 dark:text-white leading-none">{request.bloodGroup}</h2>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Required Blood</p>
+                            </div>
                         </div>
-                        {getStatusBadge(request.status)}
+                        <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ring-1 ${
+                            request.status === 'pending' ? 'bg-amber-50 text-amber-600 ring-amber-200 dark:bg-amber-500/10' :
+                            request.status === 'inprogress' ? 'bg-blue-50 text-blue-600 ring-blue-200 dark:bg-blue-500/10' :
+                            'bg-emerald-50 text-emerald-600 ring-emerald-200 dark:bg-emerald-500/10'
+                        }`}>
+                            {request.status}
+                        </span>
                     </div>
 
-                    {/* Blood Group Highlight */}
-                    <div className="bg-red-50 border-b-2 border-red-200 px-8 py-4 flex items-center gap-4">
-                        <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center">
-                            <Droplet className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-600 mb-1">Required Blood Type</p>
-                            <p className="text-3xl font-bold text-red-600">{request.bloodGroup}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Main Content Grid */}
-                <div data-aos="zoom-in" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Recipient Information */}
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                        <div className="flex items-center gap-2 mb-6 pb-4 border-b">
-                            <User className="w-6 h-6 text-red-600" />
-                            <h2 className="text-xl font-bold text-gray-800">Recipient Information</h2>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-500 mb-1">Full Name</label>
-                                <div className="flex items-center gap-2 text-gray-800">
-                                    <User className="w-5 h-5 text-gray-400" />
-                                    <span className="font-semibold text-lg">{request.recipientName}</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-500 mb-1">Hospital</label>
-                                <div className="flex items-center gap-2 text-gray-800">
-                                    <Building2 className="w-5 h-5 text-gray-400" />
-                                    <span className="font-medium">{request.hospital}</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-500 mb-1">Full Address</label>
-                                <div className="flex items-start gap-2 text-gray-800">
-                                    <Home className="w-5 h-5 text-gray-400 mt-0.5" />
-                                    <span className="font-medium">{request.address}</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-500 mb-1">Location</label>
-                                <div className="flex items-center gap-2 text-gray-800">
-                                    <MapPin className="w-5 h-5 text-gray-400" />
-                                    <span className="font-medium">{request.upazila}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Requester Information */}
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                        <div className="flex items-center gap-2 mb-6 pb-4 border-b">
-                            <Mail className="w-6 h-6 text-red-600" />
-                            <h2 className="text-xl font-bold text-gray-800">Requester Information</h2>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-500 mb-1">Name</label>
-                                <div className="flex items-center gap-2 text-gray-800">
-                                    <User className="w-5 h-5 text-gray-400" />
-                                    <span className="font-semibold text-lg">{request.requesterName}</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-500 mb-1">Email Address</label>
-                                <div className="flex items-center gap-2 text-gray-800">
-                                    <Mail className="w-5 h-5 text-gray-400" />
-                                    <a
-                                        href={`mailto:${request.requesterEmail}`}
-                                        className="font-medium text-red-600 hover:underline"
-                                    >
-                                        {request.requesterEmail}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Donation Schedule */}
-                <div data-aos="zoom-out" className="bg-white rounded-xl shadow-lg p-6 mt-6">
-                    <div className="flex items-center gap-2 mb-6 pb-4 border-b">
-                        <Calendar className="w-6 h-6 text-red-600" />
-                        <h2 className="text-xl font-bold text-gray-800">Donation Schedule</h2>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">Date</label>
-                            <div className="flex items-center gap-2 text-gray-800">
-                                <Calendar className="w-5 h-5 text-gray-400" />
-                                <span className="font-semibold text-lg">{request.donationDate}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">Time</label>
-                            <div className="flex items-center gap-2 text-gray-800">
-                                <Clock className="w-5 h-5 text-gray-400" />
-                                <span className="font-semibold text-lg">{request.donationTime}</span>
-                            </div>
-                        </div>
-
-                        <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
-                            <div className="flex items-start gap-2">
-                                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                                <p className="text-sm text-red-800">
-                                    Please arrive 15 minutes before the scheduled time. Remember to bring a valid ID.
+                    {/* Content Body */}
+                    <div className="p-6 space-y-6">
+                        
+                        {/* Recipient & Hospital Section */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <User size={12}/> Recipient Name
                                 </p>
+                                <p className="text-slate-700 dark:text-slate-200 font-bold">{request.recipientName}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Building2 size={12}/> Hospital
+                                </p>
+                                <p className="text-slate-700 dark:text-slate-200 font-bold">{request.hospital}</p>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Additional Information */}
-                <div data-aos="fade-right" className="bg-white rounded-xl shadow-lg p-6 mt-6">
-                    <div className="flex items-center gap-2 mb-6 pb-4 border-b">
-                        <MessageSquare className="w-6 h-6 text-red-600" />
-                        <h2 className="text-xl font-bold text-gray-800">Additional Message</h2>
-                    </div>
-
-                    {request.message ? (
-                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <p className="text-gray-800 leading-relaxed">{request.message}</p>
+                        {/* Location */}
+                        <div className="space-y-1 pt-4 border-t dark:border-slate-800">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <MapPin size={12}/> Full Location
+                            </p>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
+                                {request.address}, {request.upazila}
+                            </p>
                         </div>
-                    ) : (
-                        <p className="text-gray-500 italic">No additional message provided</p>
-                    )}
-                </div>
 
-                {/* Action Buttons */}
-                <div  data-aos="flip-left" className="mt-6 bg-white rounded-xl shadow-lg p-6 flex flex-col sm:flex-row gap-4 justify-center">
-                    <a
-                        href={`mailto:${request.requesterEmail}?subject=Blood Donation Request - ${request.bloodGroup}&body=Hi ${request.requesterName}, I am interested in donating blood for your request.`}
-                        className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-center"
-                    >
-                        Contact Requester
-                    </a>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium text-center"
-                    >
-                        Back to List
-                    </button>
+                        {/* Date & Time */}
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t dark:border-slate-800">
+                            <div className="flex items-center gap-3">
+                                <Calendar size={16} className="text-slate-400" />
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase">Date</p>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{request.donationDate}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 border-l dark:border-slate-800 pl-4">
+                                <Clock size={16} className="text-slate-400" />
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase">Time</p>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{request.donationTime}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Message Note (Conditional) */}
+                        {request.message && (
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                                <p className="text-[10px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1.5">
+                                    <MessageSquare size={12}/> Note
+                                </p>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 italic">"{request.message}"</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Bottom Info Bar */}
+                    <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border-t dark:border-slate-800 flex justify-between items-center">
+                        <div className="text-[10px] text-slate-400 font-medium">
+                            Request ID: <span className="font-mono text-slate-500 uppercase">{request._id.slice(-8)}</span>
+                        </div>
+                        <button 
+                            onClick={() => navigate(-1)}
+                            className="text-xs font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
