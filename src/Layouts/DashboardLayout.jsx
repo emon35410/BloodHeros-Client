@@ -152,7 +152,7 @@ const DashboardLayout = () => {
                              </button>
                         </div>
                         
-                        <Link to="/dashboard/myprofile" className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+                        <Link to="/myprofile" className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100 shadow-sm'}`}>
                             <div className="w-11 h-11 rounded-xl overflow-hidden shadow-sm">
                                 <img className="w-full h-full object-cover" src={userData?.photoURL} alt="User" />
                             </div>
