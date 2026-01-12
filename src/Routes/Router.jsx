@@ -56,7 +56,7 @@ export const router = createBrowserRouter([
       },
       {
         path:"donorBloodRequest",
-        element:<PrivateRoutes><DonorRequestDonation></DonorRequestDonation></PrivateRoutes>
+        element:<DonorRequestDonation></DonorRequestDonation>
       },
       {
         path: "location",
@@ -72,11 +72,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "requests/:id",
-        element: <PrivateRoutes><ViewDetails></ViewDetails></PrivateRoutes>
+        element: <ViewDetails></ViewDetails>
       },
       {
         path: "donateRequest/:id",
-        element: <PrivateRoutes><DonorDetailsView></DonorDetailsView></PrivateRoutes>
+        element: <DonorDetailsView></DonorDetailsView>
       },
 
       {
